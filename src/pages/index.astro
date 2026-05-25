@@ -14,23 +14,31 @@ const spins = [
 ---
 
 <Layout>
-  <div class="mx-auto max-w-6xl px-5 py-10 md:py-16">
-    <div class="grid gap-8 md:grid-cols-[minmax(0,330px)_1fr] md:gap-12 lg:gap-16">
-      <Sidebar />
+  <div class="mx-auto max-w-6xl px-5">
+    <div class="md:flex md:items-start md:gap-10 lg:gap-14">
+      <!-- Left: full-height pinned profile panel -->
+      <div
+        class="py-10 md:sticky md:top-0 md:h-screen md:w-[320px] md:shrink-0 md:overflow-y-auto md:py-12"
+      >
+        <Sidebar />
+      </div>
 
-      <main>
-        <ul class="grid gap-3 sm:grid-cols-2 lg:gap-4">
-          {
-            projects.map((project, i) => (
-              <ProjectCard project={project} spin={spins[i % spins.length]} />
-            ))
-          }
-        </ul>
-      </main>
+      <!-- Right: scrolling project grid + footer (keeps the panel pinned full-height) -->
+      <div class="flex flex-1 flex-col py-6 md:py-12">
+        <main>
+          <ul class="grid gap-3 sm:grid-cols-2 lg:gap-4">
+            {
+              projects.map((project, i) => (
+                <ProjectCard project={project} spin={spins[i % spins.length]} />
+              ))
+            }
+          </ul>
+        </main>
+
+        <footer class="mt-12 text-center text-sm text-ink/50 md:text-left">
+          © {new Date().getFullYear()} Bipul (Boopul) · Build quietly.
+        </footer>
+      </div>
     </div>
-
-    <footer class="mt-16 text-center text-sm text-ink/50">
-      © {new Date().getFullYear()} Bipul (Boopul) · Build quietly.
-    </footer>
   </div>
 </Layout>
