@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Theme tokens — mapped from the provided design system
+   ============================================================ */
+@theme {
+  /* Colors */
+  --color-primary: #e0a82e;
+  --color-secondary: #9ca3af;
+  --color-accent: #e0a82e;
+  --color-background: #e6e6e6;
+  --color-surface: #ffffff;
+  --color-ink: #333333;
+  --color-link: #181830;
+
+  /* Typography — system stack for body, Rubik for headings (matches Indie Page) */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-heading: "Rubik", ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale (h1 36px, h2 16px, body 16px from tokens, plus a display size) */
+  --text-display: 3.5rem; /* 56px hero */
+  --text-h1: 2.25rem; /* 36px */
+  --text-h2: 1rem; /* 16px */
+  --text-body: 1rem; /* 16px */
+
+  /* Spacing base unit = 4px (Tailwind default already 0.25rem steps) */
+
+  /* Radius — base token 16px */
+  --radius-token: 16px;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    color: var(--color-link);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  a {
+    color: var(--color-link);
+  }
+
+  ::selection {
+    background-color: var(--color-primary);
+    color: var(--color-link);
+  }
+}
+
+/* ============================================================
+   Components — honoring the asymmetric corner radii from tokens
+   ============================================================ */
+@layer components {
+  /* Primary button: rounded on the RIGHT side only (0 / 8 / 8 / 0) */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    background-color: var(--color-primary);
+    color: var(--color-link);
+    border: 1px solid var(--color-primary);
+    border-radius: 0 8px 8px 0;
+    transition:
+      transform 0.15s ease,
+      filter 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .btn-primary:hover {
+    filter: brightness(0.95);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  /* Secondary button: fully rounded (16px all corners) */
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    border: 1px solid rgba(24, 24, 48, 0.12);
+    border-radius: 16px;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .btn-secondary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px -8px rgba(24, 24, 48, 0.25);
+  }
+
+  /* Input: rounded on the LEFT side only (8 / 0 / 0 / 8) */
+  .input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    border: 1px solid var(--color-primary);
+    border-radius: 8px 0 0 8px;
+    outline: none;
+    transition: box-shadow 0.15s ease;
+  }
+  .input-field:focus {
+    box-shadow: 0 0 0 3px rgba(224, 168, 46, 0.25);
+  }
+
+  /* Card surface using the 16px base radius */
+  .card {
+    background-color: var(--color-surface);
+    border: 1px solid rgba(24, 24, 48, 0.08);
+    border-radius: var(--radius-token);
+  }
+}

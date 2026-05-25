@@ -1,0 +1,36 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Sidebar from "../components/Sidebar.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { projects } from "../data/projects";
+
+// Rotate hover animations across cards, like the Indie Page
+const spins = [
+  "group-hover:-rotate-12",
+  "group-hover:scale-[1.15]",
+  "group-hover:rotate-12",
+  "group-hover:-skew-y-12",
+];
+---
+
+<Layout>
+  <div class="mx-auto max-w-6xl px-5 py-10 md:py-16">
+    <div class="grid gap-8 md:grid-cols-[minmax(0,330px)_1fr] md:gap-12 lg:gap-16">
+      <Sidebar />
+
+      <main>
+        <ul class="grid gap-3 sm:grid-cols-2 lg:gap-4">
+          {
+            projects.map((project, i) => (
+              <ProjectCard project={project} spin={spins[i % spins.length]} />
+            ))
+          }
+        </ul>
+      </main>
+    </div>
+
+    <footer class="mt-16 text-center text-sm text-ink/50">
+      © {new Date().getFullYear()} Bipul (Boopul) · Build quietly.
+    </footer>
+  </div>
+</Layout>
