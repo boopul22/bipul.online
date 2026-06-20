@@ -25,3 +25,9 @@ pnpm-debug.log*
 
 # playwright mcp screenshots
 .playwright-mcp/
+
+# Cloudflare local secrets
+.dev.vars
+
+# Cloudflare wrangler local state
+.wrangler/

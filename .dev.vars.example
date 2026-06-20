@@ -1,0 +1,12 @@
+# Copy to `.dev.vars` for local `astro dev` (read via Cloudflare platformProxy).
+# In production set these in the Cloudflare Pages dashboard → Settings → Variables
+# (or `npx wrangler pages secret put ...`). DO NOT commit the real values.
+
+# The full service-account JSON, single-lined. Easiest: wrap the downloaded
+# key file contents in single quotes on one line. This is the ONLY required
+# secret — the domain→property-id map is baked into src/pages/api/traffic.ts.
+GA_SA_KEY='{"type":"service_account","project_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"portfolio-ga@your-project.iam.gserviceaccount.com", ...}'
+
+# OPTIONAL — only set this to override the baked-in map (e.g. to add/remove a
+# site or fix a property id). JSON: { "domain": "numericPropertyId", ... }
+# GA_PROPERTY_MAP='{"freetexttospeech.net":"532702784","imagepaste.org":"533689364"}'

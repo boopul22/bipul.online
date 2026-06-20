@@ -1,5 +1,6 @@
 ---
 import type { Project } from "../data/projects";
+import { CHART, buildSparkline, fmtK as fmt, normalizeHost } from "../lib/sparkline";
 
 interface Props {
   project: Project;
@@ -9,61 +10,21 @@ interface Props {
 
 const { project, spin = "group-hover:-rotate-12" } = Astro.props;
 
-// --- Chart geometry ---
-const W = 300;
-const H = 90;
-const PAD_Y = 10;
-
+// --- Chart geometry (baked from demo data; live GA values hydrate client-side) ---
+const { W, H } = CHART;
 const data = project.chart;
-const max = Math.max(...data);
-const min = Math.min(...data);
-const range = max - min || 1;
-
-const points = data.map((v, i) => {
-  const x = (i / (data.length - 1)) * W;
-  const y = H - PAD_Y - ((v - min) / range) * (H - PAD_Y * 2);
-  return [x, y] as [number, number];
-});
-
-// Catmull-Rom -> cubic Bézier smoothing
-function smoothPath(pts: [number, number][]): string {
-  if (pts.length < 2) return "";
-  let d = `M ${pts[0][0]},${pts[0][1]}`;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] ?? pts[i];
-    const p1 = pts[i];
-    const p2 = pts[i + 1];
-    const p3 = pts[i + 2] ?? p2;
-    const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
-    const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
-    const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
-    const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
-    d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2[0]},${p2[1]}`;
-  }
-  return d;
-}
-
-const linePath = smoothPath(points);
-const areaPath = `${linePath} L ${W},${H} L 0,${H} Z`;
+const { linePath, areaPath, max, min } = buildSparkline(data);
 const gradId = `grad-${project.name.replace(/[^a-z0-9]/gi, "")}`;
 
 const months = ["Jul", "Sep", "Nov", "Jan", "Mar", "May"];
 
-// k-formatter: 14000 -> "14k", 6800 -> "6.8k", 940 -> "940"
-function fmt(n: number): string {
-  if (n >= 1000) {
-    const k = n / 1000;
-    return (k >= 10 ? Math.round(k).toString() : k.toFixed(1).replace(/\.0$/, "")) + "k";
-  }
-  return Math.round(n).toString();
-}
-
 const badgeValue = project.visits ?? data[data.length - 1];
+const liveKey = normalizeHost(project.domain);
 const favicon =
   project.icon ?? `https://www.google.com/s2/favicons?sz=128&domain=${project.domain}`;
 ---
 
-<li class="card overflow-hidden">
+<li class="card overflow-hidden" data-domain={liveKey}>
   <a
     href={project.url}
     target="_blank"
@@ -82,6 +43,18 @@ const favicon =
       />
       <p class="mr-auto font-semibold text-ink lg:text-base">{project.name}</p>
 
+      <!-- Live "active now" pill — revealed by the client script when >0 -->
+      <span
+        class="js-active hidden items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold text-emerald-600"
+        title="Visitors online right now"
+      >
+        <span class="relative flex h-1.5 w-1.5">
+          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+          <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+        </span>
+        <span class="js-active-count">0</span> now
+      </span>
+
       {
         project.status ? (
           <span class="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2.5 py-0.5 text-xs font-semibold text-link">
@@ -96,7 +69,7 @@ const favicon =
                 <circle cx="12" cy="12" r="2.5" />
               </svg>
             </span>
-            {fmt(badgeValue)}/mo
+            <span class="js-badge">{fmt(badgeValue)}</span>/mo
           </span>
         )
       }
@@ -110,8 +83,8 @@ const favicon =
       <div
         class="flex h-20 flex-col justify-between py-1 text-[10px] font-medium text-ink/40 lg:h-24"
       >
-        <span>{fmt(max)}</span>
-        <span>{fmt(min)}</span>
+        <span class="js-max">{fmt(max)}</span>
+        <span class="js-min">{fmt(min)}</span>
       </div>
       <div class="min-w-0 flex-1">
         <svg
@@ -127,8 +100,9 @@ const favicon =
               <stop offset="100%" stop-color="#e0a82e" stop-opacity="0"></stop>
             </linearGradient>
           </defs>
-          <path d={areaPath} fill={`url(#${gradId})`}></path>
+          <path class="js-area" d={areaPath} fill={`url(#${gradId})`}></path>
           <path
+            class="js-line"
             d={linePath}
             fill="none"
             stroke="#e0a82e"
@@ -137,7 +111,7 @@ const favicon =
             stroke-linejoin="round"
             vector-effect="non-scaling-stroke"></path>
         </svg>
-        <div class="mt-1 flex justify-between text-[10px] text-ink/40">
+        <div class="js-axis mt-1 flex justify-between text-[10px] text-ink/40">
           {months.map((m) => <span>{m}</span>)}
         </div>
       </div>
