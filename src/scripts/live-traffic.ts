@@ -20,12 +20,17 @@ type Payload = {
 const AXIS_LABELS = ["4w", "3w", "2w", "1w", "now"];
 
 function hydrateCard(card: HTMLElement, site: SiteTraffic) {
-  // Badge — monthly visitors (last 28 days)
+  // Badge — monthly visitors (last 28 days). Revealed once we have a number.
   const badge = card.querySelector<HTMLElement>(".js-badge");
-  if (badge && site.users28d > 0) badge.textContent = fmtK(site.users28d);
+  const badgePill = card.querySelector<HTMLElement>(".js-badge-pill");
+  if (badge && badgePill) {
+    badge.textContent = fmtK(site.users28d);
+    badgePill.classList.remove("hidden");
+    badgePill.classList.add("inline-flex");
+  }
 
-  // Sparkline — redraw from the daily trend
-  if (site.trend && site.trend.length >= 2 && site.trend.some((v) => v > 0)) {
+  // Sparkline — draw from the daily trend, then drop the loading spinner.
+  if (site.trend && site.trend.length >= 2) {
     const { linePath, areaPath, max, min } = buildSparkline(site.trend);
     card.querySelector(".js-line")?.setAttribute("d", linePath);
     card.querySelector(".js-area")?.setAttribute("d", areaPath);
@@ -34,10 +39,13 @@ function hydrateCard(card: HTMLElement, site: SiteTraffic) {
     if (maxEl) maxEl.textContent = fmtK(max);
     if (minEl) minEl.textContent = fmtK(min);
 
-    // Swap month labels for relative-week markers matching the 28-day window
+    // Relative-week markers matching the 28-day window
     const axis = card.querySelector<HTMLElement>(".js-axis");
     if (axis) axis.innerHTML = AXIS_LABELS.map((l) => `<span>${l}</span>`).join("");
   }
+
+  // Live data has landed — hide the spinner.
+  card.querySelector(".js-spinner")?.classList.add("hidden");
 
   // "Active now" pill
   const pill = card.querySelector<HTMLElement>(".js-active");

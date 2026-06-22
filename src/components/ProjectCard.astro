@@ -1,6 +1,6 @@
 ---
 import type { Project } from "../data/projects";
-import { CHART, buildSparkline, fmtK as fmt, normalizeHost } from "../lib/sparkline";
+import { CHART, normalizeHost } from "../lib/sparkline";
 
 interface Props {
   project: Project;
@@ -10,15 +10,11 @@ interface Props {
 
 const { project, spin = "group-hover:-rotate-12" } = Astro.props;
 
-// --- Chart geometry (baked from demo data; live GA values hydrate client-side) ---
+// All metrics are live GA4 data, hydrated client-side by live-traffic.ts.
+// The card renders empty paths + a spinner until that data arrives.
 const { W, H } = CHART;
-const data = project.chart;
-const { linePath, areaPath, max, min } = buildSparkline(data);
 const gradId = `grad-${project.name.replace(/[^a-z0-9]/gi, "")}`;
 
-const months = ["Jul", "Sep", "Nov", "Jan", "Mar", "May"];
-
-const badgeValue = project.visits ?? data[data.length - 1];
 const liveKey = normalizeHost(project.domain);
 const favicon =
   project.icon ?? `https://www.google.com/s2/favicons?sz=128&domain=${project.domain}`;
@@ -62,14 +58,14 @@ const favicon =
             {project.status}
           </span>
         ) : (
-          <span class="relative inline-flex items-center rounded-full bg-black/[0.06] py-0.5 pr-2.5 pl-6 text-xs font-semibold whitespace-nowrap text-ink/80">
+          <span class="js-badge-pill relative hidden items-center rounded-full bg-black/[0.06] py-0.5 pr-2.5 pl-6 text-xs font-semibold whitespace-nowrap text-ink/80">
             <span class="absolute -left-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-link">
               <svg viewBox="0 0 24 24" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
                 <circle cx="12" cy="12" r="2.5" />
               </svg>
             </span>
-            <span class="js-badge">{fmt(badgeValue)}</span>/mo
+            <span class="js-badge"></span>/mo
           </span>
         )
       }
@@ -78,15 +74,21 @@ const favicon =
     <!-- Tagline -->
     <p class="text-xs text-ink/70 lg:text-sm">{project.tagline}</p>
 
-    <!-- Chart: y-axis min/max + area + month x-axis -->
+    <!-- Chart: y-axis min/max + area + x-axis. Empty until GA4 data hydrates. -->
     <div class="flex gap-2 pt-1">
       <div
         class="flex h-20 flex-col justify-between py-1 text-[10px] font-medium text-ink/40 lg:h-24"
       >
-        <span class="js-max">{fmt(max)}</span>
-        <span class="js-min">{fmt(min)}</span>
+        <span class="js-max"></span>
+        <span class="js-min"></span>
       </div>
-      <div class="min-w-0 flex-1">
+      <div class="relative min-w-0 flex-1">
+        <!-- Loading spinner — hidden by the client script once live data lands -->
+        <div class="js-spinner absolute inset-0 flex h-20 items-center justify-center lg:h-24">
+          <span
+            class="h-5 w-5 animate-spin rounded-full border-2 border-ink/15 border-t-primary"
+          ></span>
+        </div>
         <svg
           viewBox={`0 0 ${W} ${H}`}
           class="h-20 w-full lg:h-24"
@@ -100,10 +102,10 @@ const favicon =
               <stop offset="100%" stop-color="#e0a82e" stop-opacity="0"></stop>
             </linearGradient>
           </defs>
-          <path class="js-area" d={areaPath} fill={`url(#${gradId})`}></path>
+          <path class="js-area" d="" fill={`url(#${gradId})`}></path>
           <path
             class="js-line"
-            d={linePath}
+            d=""
             fill="none"
             stroke="#e0a82e"
             stroke-width="2"
@@ -111,9 +113,7 @@ const favicon =
             stroke-linejoin="round"
             vector-effect="non-scaling-stroke"></path>
         </svg>
-        <div class="js-axis mt-1 flex justify-between text-[10px] text-ink/40">
-          {months.map((m) => <span>{m}</span>)}
-        </div>
+        <div class="js-axis mt-1 flex justify-between text-[10px] text-ink/40"></div>
       </div>
     </div>
   </a>

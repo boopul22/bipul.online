@@ -1,15 +1,8 @@
 ---
-import { projects } from "../data/projects";
-
 const email = "blog.boopul@gmail.com";
 
-// Aggregate monthly visitors across projects (from the demo/editable data)
-const totalVisits = projects.reduce(
-  (sum, p) => sum + (p.visits ?? p.chart[p.chart.length - 1]),
-  0,
-);
-const totalLabel =
-  totalVisits >= 1000 ? `${Math.round(totalVisits / 1000)}k` : `${totalVisits}`;
+// Total monthly visitors is live GA4 data — summed client-side in
+// live-traffic.ts (.js-total). Shows a spinner until that arrives.
 const socials = [
   {
     label: "GitHub",
@@ -51,7 +44,11 @@ const socials = [
         <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z" />
         <circle cx="12" cy="12" r="2.5" />
       </svg>
-      ~<span class="js-total">{totalLabel}</span> visits/mo
+      ~<span class="js-total inline-flex items-center"
+        ><span
+          class="h-3 w-3 animate-spin rounded-full border-2 border-ink/15 border-t-primary"
+        ></span></span
+      > visits/mo
     </span>
   </div>
 
