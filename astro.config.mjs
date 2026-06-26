@@ -8,6 +8,7 @@ import cloudflare from '@astrojs/cloudflare';
 // Pages are prerendered (static) by default; only routes that export
 // `prerender = false` (e.g. /api/traffic) run on-demand on Cloudflare.
 export default defineConfig({
+  site: 'https://boopul.online',
   output: 'static',
   adapter: cloudflare({
     // Lets `astro dev` read Cloudflare env (.dev.vars / wrangler) so the
