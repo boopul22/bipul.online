@@ -1,11 +1,8 @@
-// Runs in the browser: fetches live GA4 numbers from the SSR /api/traffic
-// endpoint and hydrates each project card. Cards keep their baked demo values
-// until (and unless) this succeeds, so the page is never blank or broken.
+// Runs in the browser: fetches live GA4 numbers from the /api/traffic
+// endpoint and fills in the visit counts — the total in the hero
+// (.js-total) and one number per project row (.js-visits). Rows keep
+// their placeholder until (and unless) this succeeds.
 
-import { buildSparkline, fmtK } from "../lib/sparkline";
-
-// Mirrors the SiteTraffic shape returned by /api/traffic (defined server-side
-// in lib/ga.ts) — kept local so no server-only code is bundled into the client.
 interface SiteTraffic {
   users28d: number;
   trend: number[];
@@ -17,49 +14,13 @@ type Payload = {
   sites: Record<string, SiteTraffic>;
 };
 
-const AXIS_LABELS = ["4w", "3w", "2w", "1w", "now"];
-
-function hydrateCard(card: HTMLElement, site: SiteTraffic) {
-  // Badge — monthly visitors (last 28 days). Revealed once we have a number.
-  const badge = card.querySelector<HTMLElement>(".js-badge");
-  const badgePill = card.querySelector<HTMLElement>(".js-badge-pill");
-  if (badge && badgePill) {
-    badge.textContent = fmtK(site.users28d);
-    badgePill.classList.remove("hidden");
-    badgePill.classList.add("inline-flex");
+/** 14000 -> "14k", 6800 -> "6.8k", 940 -> "940". */
+function fmtK(n: number): string {
+  if (n >= 1000) {
+    const k = n / 1000;
+    return (k >= 10 ? Math.round(k).toString() : k.toFixed(1).replace(/\.0$/, "")) + "k";
   }
-
-  // Sparkline — draw from the daily trend, then drop the loading spinner.
-  if (site.trend && site.trend.length >= 2) {
-    const { linePath, areaPath, max, min } = buildSparkline(site.trend);
-    card.querySelector(".js-line")?.setAttribute("d", linePath);
-    card.querySelector(".js-area")?.setAttribute("d", areaPath);
-    const maxEl = card.querySelector<HTMLElement>(".js-max");
-    const minEl = card.querySelector<HTMLElement>(".js-min");
-    if (maxEl) maxEl.textContent = fmtK(max);
-    if (minEl) minEl.textContent = fmtK(min);
-
-    // Relative-week markers matching the 28-day window
-    const axis = card.querySelector<HTMLElement>(".js-axis");
-    if (axis) axis.innerHTML = AXIS_LABELS.map((l) => `<span>${l}</span>`).join("");
-  }
-
-  // Live data has landed — hide the spinner.
-  card.querySelector(".js-spinner")?.classList.add("hidden");
-
-  // "Active now" pill
-  const pill = card.querySelector<HTMLElement>(".js-active");
-  const count = card.querySelector<HTMLElement>(".js-active-count");
-  if (pill && count) {
-    if (site.activeNow > 0) {
-      count.textContent = String(site.activeNow);
-      pill.classList.remove("hidden");
-      pill.classList.add("inline-flex");
-    } else {
-      pill.classList.add("hidden");
-      pill.classList.remove("inline-flex");
-    }
-  }
+  return Math.round(n).toString();
 }
 
 async function refresh() {
@@ -69,18 +30,25 @@ async function refresh() {
     const data = (await res.json()) as Payload;
     if (!data?.sites) return;
 
-    document.querySelectorAll<HTMLElement>("[data-domain]").forEach((card) => {
-      const key = card.dataset.domain;
+    // One count per project row.
+    document.querySelectorAll<HTMLElement>("[data-domain]").forEach((row) => {
+      const key = row.dataset.domain;
       const site = key ? data.sites[key] : undefined;
-      if (site) hydrateCard(card, site);
+      const el = row.querySelector<HTMLElement>(".js-visits");
+      if (el && site) el.textContent = fmtK(site.users28d);
     });
 
-    // Sidebar "~N visits/mo" = live sum of every site's 28-day users.
+    // Hero "~N visits/mo" = live sum of every site's 28-day users.
     const total = Object.values(data.sites).reduce((a, s) => a + (s.users28d || 0), 0);
     const totalEl = document.querySelector<HTMLElement>(".js-total");
     if (totalEl && total > 0) totalEl.textContent = fmtK(total);
+
+    // Header "N online" = live users across every site (last 30 min).
+    const online = Object.values(data.sites).reduce((a, s) => a + (s.activeNow || 0), 0);
+    const liveEl = document.querySelector<HTMLElement>(".js-live");
+    if (liveEl) liveEl.textContent = String(online);
   } catch {
-    /* network/API hiccup — keep the baked fallback values */
+    /* network/API hiccup — keep the placeholders */
   }
 }
 

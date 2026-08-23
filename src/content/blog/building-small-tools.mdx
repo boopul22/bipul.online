@@ -1,0 +1,34 @@
+---
+title: "Building small tools that solve real problems"
+description: "Why I ship tiny, focused utilities instead of chasing big ideas — and what I've learned doing it."
+pubDate: 2026-08-23
+---
+
+I don't build startups. I build small tools — the kind of thing you find at
+2am, use for thirty seconds, and leave happy. A text-to-speech page that works
+without signup. An image uploader that just gives you a link.
+
+## Why small
+
+Small tools are honest. There's no onboarding, no pricing page, no "book a
+demo." The problem is right there on the screen, and the solution is one
+click away.
+
+- They ship in days, not months
+- If nobody uses them, the cost of being wrong was a week
+- If everybody uses them, they quietly pay for themselves
+
+## The rule I follow
+
+> If it can't explain itself in one sentence, it's two products wearing a
+> trench coat.
+
+That's the whole philosophy. Learn what the project needs, build the smallest
+version that solves the problem, then watch what people actually do with it.
+
+```ts
+// the entire deployment strategy
+const ship = () => deploy("boopul.online");
+```
+
+More notes on how each tool is built will live here as I write them.

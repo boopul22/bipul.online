@@ -1,0 +1,52 @@
+---
+import type { CollectionEntry } from "astro:content";
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const dateFmt = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+});
+---
+
+<Layout
+  title={`${post.data.title} — Bipul Kumar`}
+  description={post.data.description ?? "A post by Bipul Kumar."}
+>
+  <SiteHeader active="writing" />
+
+  <article class="flex flex-col gap-8">
+    <header class="reveal flex flex-col gap-2" style="--i: 1">
+      <h1 class="text-3xl font-semibold tracking-tight text-foreground">
+        {post.data.title}
+      </h1>
+      <time class="text-sm text-muted tabular-nums" datetime={post.data.pubDate.toISOString()}>
+        {dateFmt.format(post.data.pubDate)}
+      </time>
+    </header>
+
+    <div class="post-prose reveal" style="--i: 2">
+      <Content />
+    </div>
+  </article>
+
+  <SiteFooter />
+</Layout>

@@ -1,53 +1,213 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Sidebar from "../components/Sidebar.astro";
-import ProjectCard from "../components/ProjectCard.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import { getCollection } from "astro:content";
 import { projects } from "../data/projects";
 
-// Rotate hover animations across cards, like the Indie Page
-const spins = [
-  "group-hover:-rotate-12",
-  "group-hover:scale-[1.15]",
-  "group-hover:rotate-12",
-  "group-hover:-skew-y-12",
-];
+const email = "blog.boopul@gmail.com";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const dateFmt = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+
+// Staggered reveal indices continue across sections.
+const writingStart = 2 + projects.length;
+const elsewhereStart = writingStart + posts.length;
 ---
 
 <Layout>
-  <div class="mx-auto max-w-6xl px-5">
-    <div class="md:flex md:items-start md:gap-10 lg:gap-14">
-      <!-- Left: full-height pinned profile panel -->
-      <div
-        class="py-10 md:sticky md:top-0 md:h-screen md:w-[320px] md:shrink-0 md:overflow-y-auto md:py-12"
-      >
-        <Sidebar />
-      </div>
+  <SiteHeader active="home" />
 
-      <!-- Right: scrolling project grid + footer (keeps the panel pinned full-height) -->
-      <div class="flex flex-1 flex-col py-6 md:py-12">
-        <main>
-          <ul class="grid gap-3 sm:grid-cols-2 lg:gap-4">
-            {
-              projects.map((project, i) => (
-                <ProjectCard project={project} spin={spins[i % spins.length]} />
-              ))
-            }
-          </ul>
-        </main>
-
-        <footer class="mt-12 text-center text-sm text-ink/50 md:text-left">
-          © {new Date().getFullYear()} Bipul Kumar · Build quietly.
-          {' · '}
-          <a href="https://extractpics.com/image-downloader" target="_blank" rel="noopener" class="text-ink/50 hover:text-ink transition-colors">image downloader</a>
-          {' · '}
-          <a href="https://freepromptbase.com/" target="_blank" rel="noopener" class="text-ink/50 hover:text-ink transition-colors">ai prompt</a>
-        </footer>
-      </div>
+  <section class="reveal flex items-start gap-5" style="--i: 1">
+    <img
+      src="/profile.png"
+      alt="Bipul Kumar"
+      loading="lazy"
+      decoding="async"
+      width="256"
+      height="256"
+      class="size-16 rounded-full ring-1 ring-border md:size-20"
+    />
+    <div class="flex flex-col gap-1.5">
+      <h1 class="text-lg font-semibold tracking-tight text-foreground md:text-xl">
+        Bipul Kumar
+      </h1>
+      <p class="text-secondary leading-relaxed">
+        Generalist builder from India making small tools that solve real
+        problems. Consistency beats talent. Action beats intention.
+      </p>
+      <p class="text-sm text-muted">
+        ~<span class="js-total">&hellip;</span> visits/mo across my tools
+      </p>
     </div>
-  </div>
+  </section>
+
+  <section class="flex flex-col gap-3" id="about">
+    <div class="text-sm font-medium text-muted">
+      <h2>About</h2>
+    </div>
+    <div
+      class="flex flex-col gap-3 text-secondary leading-relaxed text-pretty tracking-[-0.005em]"
+    >
+      <p>
+        I paid my own way through college and taught myself the rest. Still
+        building.
+      </p>
+      <p>
+        Whatever a project needs, I learn it and ship it — text-to-speech,
+        image utilities, calculators, prompt libraries. No big team, no
+        funding, just steady work.
+      </p>
+      <p>
+        Everything I make lives here. Most of it is free, fast, and signup-free
+        by design.
+      </p>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-3" id="projects">
+    <div class="text-sm font-medium text-muted">
+      <h2>Projects</h2>
+    </div>
+    <ul class="relative isolate flex flex-col" data-hover-list>
+      <span
+        class="pointer-events-none absolute top-0 left-0 -z-10 rounded-md bg-foreground/[0.06] opacity-0"
+        data-hover-bg
+        aria-hidden="true"></span>
+      {
+        projects.map((project, i) => (
+          <li
+            class="reveal relative -mx-2 list-none rounded-md"
+            style={`--i: ${i + 2}`}
+            data-hover-item
+            data-domain={project.domain}
+          >
+            <a
+              class="flex flex-wrap items-center gap-x-2 px-2 py-1 text-foreground"
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={project.tagline}
+            >
+              <span class="font-medium">{project.name}</span>
+              <span class="hidden text-muted text-sm sm:inline">
+                — {project.tagline}
+              </span>
+              <span
+                class="ml-auto inline-flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-muted tabular-nums"
+                title="Visitors in the last 28 days"
+              >
+                <span class="js-visits">&hellip;</span>
+                <span class="hidden sm:inline">/mo</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="flex flex-col gap-3" id="writing">
+    <div class="text-sm font-medium text-muted">
+      <h2>Writing</h2>
+    </div>
+    <ul class="relative isolate flex flex-col" data-hover-list>
+      <span
+        class="pointer-events-none absolute top-0 left-0 -z-10 rounded-md bg-foreground/[0.06] opacity-0"
+        data-hover-bg
+        aria-hidden="true"></span>
+      {
+        posts.map((post, i) => (
+          <li
+            class="reveal relative -mx-2 list-none rounded-md"
+            style={`--i: ${writingStart + i}`}
+            data-hover-item
+          >
+            <a
+              class="flex flex-wrap items-center gap-x-2 px-2 py-1 text-foreground"
+              href={`/posts/${post.id}`}
+            >
+              <span class="font-medium">{post.data.title}</span>
+              <span class="ml-auto inline-flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-muted tabular-nums">
+                <time datetime={post.data.pubDate.toISOString()}>
+                  {dateFmt.format(post.data.pubDate)}
+                </time>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <a href="/posts" class="px-2 text-sm font-medium text-muted hover:text-foreground">
+      All posts &rarr;
+    </a>
+  </section>
+
+  <section class="flex flex-col gap-3" id="elsewhere">
+    <div class="text-sm font-medium text-muted">
+      <h2>Elsewhere</h2>
+    </div>
+    <ul class="relative isolate flex flex-col" data-hover-list>
+      <span
+        class="pointer-events-none absolute top-0 left-0 -z-10 rounded-md bg-foreground/[0.06] opacity-0"
+        data-hover-bg
+        aria-hidden="true"></span>
+      <li
+        class="reveal relative -mx-2 list-none rounded-md"
+        style={`--i: ${elsewhereStart}`}
+        data-hover-item
+      >
+        <a class="flex items-center gap-x-2 px-2 py-1 text-foreground" href={`mailto:${email}`}>
+          <span class="font-medium">
+            <span class="text-muted">blog.boopul(at)</span>gmail.com
+          </span>
+        </a>
+      </li>
+      <li
+        class="reveal relative -mx-2 list-none rounded-md"
+        style={`--i: ${elsewhereStart + 1}`}
+        data-hover-item
+      >
+        <a
+          class="flex items-center gap-x-2 px-2 py-1 text-foreground"
+          href="https://github.com/boopul22"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="font-medium">
+            <span class="text-muted">github.com/</span>boopul22
+          </span>
+        </a>
+      </li>
+      <li
+        class="reveal relative -mx-2 list-none rounded-md"
+        style={`--i: ${elsewhereStart + 2}`}
+        data-hover-item
+      >
+        <a
+          class="flex items-center gap-x-2 px-2 py-1 text-foreground"
+          href="https://instagram.com/bipul.skill"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="font-medium">
+            <span class="text-muted">instagram.com/</span>bipul.skill
+          </span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <SiteFooter />
 </Layout>
 
-<!-- Hydrate cards with live GA4 traffic (no-op if the API isn't configured) -->
 <script>
-  import "../scripts/live-traffic.ts";
+  import "../scripts/hover-list.ts";
 </script>

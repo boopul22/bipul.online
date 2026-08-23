@@ -11,7 +11,10 @@
 // The service account needs Viewer on each property — easiest done once at the
 // account level (Site_mine -> Account Access Management), which cascades.
 
-import { normalizeHost } from "./sparkline";
+/** Normalise a hostname for matching: lowercase, strip leading "www." */
+function normalizeHost(host: string): string {
+  return host.trim().toLowerCase().replace(/^www\./, "");
+}
 
 export interface SiteTraffic {
   users28d: number;

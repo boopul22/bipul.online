@@ -43,6 +43,7 @@ const jsonLd = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#121212" />
 
     <title>{title}</title>
     <meta name="description" content={description} />
@@ -69,15 +70,16 @@ const jsonLd = [
     <!-- Structured data -->
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 
-    <!-- Rubik font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,400..600&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Inter (variable) font -->
+    <link rel="preconnect" href="https://rsms.me/" />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
   </head>
-  <body>
+  <body
+    class="mx-auto flex min-h-screen max-w-[42.5rem] flex-col gap-12 bg-background p-6 text-foreground md:py-8 lg:py-10"
+  >
     <slot />
+    <script>
+      import "../scripts/live-traffic.ts";
+    </script>
   </body>
 </html>

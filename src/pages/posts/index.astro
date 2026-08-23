@@ -1,0 +1,69 @@
+---
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const dateFmt = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+---
+
+<Layout
+  title="Writing — Bipul Kumar"
+  description="Notes about building software, shipping small tools, and learning along the way."
+>
+  <SiteHeader active="writing" />
+
+  <section class="reveal flex flex-col gap-1.5" style="--i: 1">
+    <h1 class="text-xl font-semibold tracking-tight text-foreground">Writing</h1>
+    <p class="text-secondary leading-relaxed">
+      Notes about building software, shipping small tools, and learning along the way.
+    </p>
+  </section>
+
+  <section class="flex flex-col gap-3">
+    <div class="text-sm font-medium text-muted">
+      <h2>All posts</h2>
+    </div>
+    <ul class="relative isolate flex flex-col" data-hover-list>
+      <span
+        class="pointer-events-none absolute top-0 left-0 -z-10 rounded-md bg-foreground/[0.06] opacity-0"
+        data-hover-bg
+        aria-hidden="true"></span>
+      {
+        posts.map((post, i) => (
+          <li
+            class="reveal relative -mx-2 list-none rounded-md"
+            style={`--i: ${i + 2}`}
+            data-hover-item
+          >
+            <a
+              class="flex flex-wrap items-center gap-x-2 px-2 py-1 text-foreground"
+              href={`/posts/${post.id}`}
+            >
+              <span class="font-medium">{post.data.title}</span>
+              <span class="ml-auto shrink-0 text-sm whitespace-nowrap text-muted tabular-nums">
+                <time datetime={post.data.pubDate.toISOString()}>
+                  {dateFmt.format(post.data.pubDate)}
+                </time>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <SiteFooter />
+</Layout>
+
+<script>
+  import "../../scripts/hover-list.ts";
+</script>

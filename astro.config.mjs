@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 
 import tailwindcss from '@tailwindcss/vite';
 import cloudflare from '@astrojs/cloudflare';
+import mdx from '@astrojs/mdx';
 
 // https://astro.build/config
 // Pages are prerendered (static) by default; only routes that export
@@ -10,6 +11,7 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://boopul.online',
   output: 'static',
+  integrations: [mdx()],
   adapter: cloudflare({
     // Lets `astro dev` read Cloudflare env (.dev.vars / wrangler) so the
     // live GA endpoint works locally too.
