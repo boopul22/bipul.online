@@ -23,7 +23,7 @@ export const projects: Project[] = [
     name: "Free Text to Speech",
     url: "https://freetexttospeech.net/",
     domain: "freetexttospeech.net",
-    tagline: "Turn text into natural-sounding speech. Free, no signup.",
+    tagline: "Turn text into natural-sounding speech for free, without signing up.",
     source: "live",
   },
   {
@@ -44,21 +44,21 @@ export const projects: Project[] = [
     name: "ImageToURL",
     url: "https://imagetourl.cloud/",
     domain: "imagetourl.cloud",
-    tagline: "Upload an image, get a link. No account needed.",
+    tagline: "Upload an image and get a link without creating an account.",
     source: "live",
   },
   {
     name: "FreePromptBase",
     url: "https://freepromptbase.com/",
     domain: "freepromptbase.com",
-    tagline: "A free library of ready-to-use AI prompts. Copy and create.",
+    tagline: "A free collection of AI prompts you can copy and use.",
     source: "cloudflare",
   },
   {
     name: "ImagePaste",
     url: "https://imagepaste.org/",
     domain: "imagepaste.org",
-    tagline: "Paste or drop an image, get a shareable link instantly.",
+    tagline: "Paste or drop an image and get a shareable link right away.",
     source: "cloudflare",
   },
   {
@@ -72,7 +72,7 @@ export const projects: Project[] = [
     name: "My Health Bestie",
     url: "https://myhealthbestie.com/",
     domain: "myhealthbestie.com",
-    tagline: "Evidence-informed health, nutrition, and wellness tips.",
+    tagline: "Health, nutrition, and wellness tips based on evidence.",
     source: "cloudflare",
   },
 ];
