@@ -1,4 +1,25 @@
-# Astro Starter Kit: Minimal
+# Boopul.online
+
+Astro portfolio deployed to the existing `bipulonline` Cloudflare Worker.
+
+## Contact and email signup
+
+Contact messages and email signups are validated by server endpoints, stored in
+the Worker's `SESSION` KV namespace, and emailed to the verified
+`blog.boopul@gmail.com` destination through the Worker's restricted `EMAIL`
+binding. Keys use the prefixes `contact:` and `subscriber:` respectively.
+
+Cloudflare Email Sending is enabled for `bipul.online`; notifications use
+`website@bipul.online`. The deploy script binds both the existing KV namespace
+and Cloudflare Email. Messages remain in KV if email delivery is unavailable.
+To list saved entries:
+
+```sh
+npx wrangler kv key list --namespace-id d357ef8dfd5e4f09b8e1393587fa8ab1 --prefix contact:
+npx wrangler kv key list --namespace-id d357ef8dfd5e4f09b8e1393587fa8ab1 --prefix subscriber:
+```
+
+## Development
 
 ```sh
 npm create astro@latest -- --template minimal

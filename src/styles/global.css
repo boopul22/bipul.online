@@ -80,6 +80,15 @@
   }
 }
 
+/* Prevent iOS from zooming the viewport when a form field receives focus. */
+@media (max-width: 639px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
 /* Pulsing availability dot in the header */
 @keyframes ping-soft {
   0% {
@@ -116,6 +125,14 @@
 }
 
 @layer components {
+  .form-status[data-state="success"] {
+    color: hsl(var(--theme-success));
+  }
+
+  .form-status[data-state="error"] {
+    color: hsl(0 72% 64%);
+  }
+
   .post-prose {
     color: hsl(var(--theme-secondary));
     line-height: 1.75;

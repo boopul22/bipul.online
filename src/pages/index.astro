@@ -5,7 +5,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 import { getCollection } from "astro:content";
 import { projects } from "../data/projects";
 
-const email = "blog.boopul@gmail.com";
+const email = "hello@bipul.online";
 
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
@@ -25,7 +25,7 @@ const elsewhereStart = writingStart + posts.length;
 <Layout>
   <SiteHeader active="home" />
 
-  <section class="reveal flex items-start gap-5" style="--i: 1">
+  <section class="reveal flex flex-col items-start gap-4 sm:flex-row sm:gap-5" style="--i: 1">
     <img
       src="/profile.png"
       alt="Bipul Kumar"
@@ -92,7 +92,7 @@ const elsewhereStart = writingStart + posts.length;
             data-domain={project.domain}
           >
             <a
-              class="flex flex-wrap items-center gap-x-2 px-2 py-1 text-foreground"
+              class="flex min-h-[44px] flex-wrap items-center gap-x-2 px-2 py-2 text-foreground sm:min-h-0 sm:py-1"
               href={project.url}
               target="_blank"
               rel="noopener noreferrer"
@@ -133,7 +133,7 @@ const elsewhereStart = writingStart + posts.length;
             data-hover-item
           >
             <a
-              class="flex flex-wrap items-center gap-x-2 px-2 py-1 text-foreground"
+              class="flex min-h-[44px] flex-wrap items-center gap-x-2 gap-y-1 px-2 py-2 text-foreground sm:min-h-0 sm:py-1"
               href={`/posts/${post.id}`}
             >
               <span class="font-medium">{post.data.title}</span>
@@ -147,7 +147,7 @@ const elsewhereStart = writingStart + posts.length;
         ))
       }
     </ul>
-    <a href="/posts" class="px-2 text-sm font-medium text-muted hover:text-foreground">
+    <a href="/posts" class="inline-flex min-h-[44px] items-center px-2 text-sm font-medium text-muted hover:text-foreground sm:min-h-0">
       All posts &rarr;
     </a>
   </section>
@@ -166,9 +166,9 @@ const elsewhereStart = writingStart + posts.length;
         style={`--i: ${elsewhereStart}`}
         data-hover-item
       >
-        <a class="flex items-center gap-x-2 px-2 py-1 text-foreground" href={`mailto:${email}`}>
-          <span class="font-medium">
-            <span class="text-muted">blog.boopul(at)</span>gmail.com
+        <a class="flex min-h-[44px] min-w-0 items-center gap-x-2 px-2 py-2 text-foreground sm:min-h-0 sm:py-1" href={`mailto:${email}`}>
+          <span class="min-w-0 break-all font-medium sm:break-normal">
+            <span class="text-muted">hello(at)</span>bipul.online
           </span>
         </a>
       </li>
@@ -178,12 +178,12 @@ const elsewhereStart = writingStart + posts.length;
         data-hover-item
       >
         <a
-          class="flex items-center gap-x-2 px-2 py-1 text-foreground"
+          class="flex min-h-[44px] min-w-0 items-center gap-x-2 px-2 py-2 text-foreground sm:min-h-0 sm:py-1"
           href="https://github.com/boopul22"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span class="font-medium">
+          <span class="min-w-0 break-all font-medium sm:break-normal">
             <span class="text-muted">github.com/</span>boopul22
           </span>
         </a>
@@ -194,12 +194,12 @@ const elsewhereStart = writingStart + posts.length;
         data-hover-item
       >
         <a
-          class="flex items-center gap-x-2 px-2 py-1 text-foreground"
+          class="flex min-h-[44px] min-w-0 items-center gap-x-2 px-2 py-2 text-foreground sm:min-h-0 sm:py-1"
           href="https://instagram.com/bipul.skill"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span class="font-medium">
+          <span class="min-w-0 break-all font-medium sm:break-normal">
             <span class="text-muted">instagram.com/</span>bipul.skill
           </span>
         </a>
@@ -207,9 +207,118 @@ const elsewhereStart = writingStart + posts.length;
     </ul>
   </section>
 
+  <section class="flex scroll-mt-8 flex-col gap-5" id="contact">
+    <div class="flex flex-col gap-1">
+      <h2 class="text-sm font-medium text-muted">Stay in touch</h2>
+      <p class="text-secondary leading-relaxed">
+        Get occasional notes about new tools and writing, or send me a message.
+      </p>
+    </div>
+
+    <form
+      action="/api/subscribe"
+      method="post"
+      class="flex flex-col gap-2"
+      data-async-form
+      data-form-name="subscribe"
+    >
+      <label for="subscribe-email" class="text-sm font-medium text-foreground">
+        Email updates
+      </label>
+      <div class="flex flex-col gap-2 sm:flex-row">
+        <input
+          id="subscribe-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          inputmode="email"
+          maxlength="254"
+          placeholder="you@example.com"
+          required
+          class="min-h-[44px] w-full min-w-0 flex-1 rounded-md border border-border bg-foreground/[0.03] px-3 py-2 text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        />
+        <button
+          type="submit"
+          data-pending-label="Joining…"
+          class="min-h-[44px] w-full rounded-md bg-foreground px-4 py-2 font-medium text-background hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+        >
+          Join the list
+        </button>
+      </div>
+      <div class="absolute -left-[10000px] h-px w-px overflow-hidden" aria-hidden="true">
+        <label for="subscribe-website">Website</label>
+        <input id="subscribe-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <p class="text-xs text-muted">Only occasional updates. Your address stays private.</p>
+      <p class="form-status text-sm" data-form-status role="status" aria-live="polite" hidden></p>
+    </form>
+
+    <div class="h-px bg-border" aria-hidden="true"></div>
+
+    <form
+      action="/api/contact"
+      method="post"
+      class="flex flex-col gap-3"
+      data-async-form
+      data-form-name="contact"
+    >
+      <div class="grid gap-3 sm:grid-cols-2">
+        <label class="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+          Name
+          <input
+            name="name"
+            type="text"
+            autocomplete="name"
+            maxlength="100"
+            required
+            class="min-h-[44px] w-full rounded-md border border-border bg-foreground/[0.03] px-3 py-2 font-normal text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </label>
+        <label class="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+          Email
+          <input
+            name="email"
+            type="email"
+            autocomplete="email"
+            inputmode="email"
+            maxlength="254"
+            required
+            class="min-h-[44px] w-full rounded-md border border-border bg-foreground/[0.03] px-3 py-2 font-normal text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+          />
+        </label>
+      </div>
+      <label class="flex flex-col gap-1.5 text-sm font-medium text-foreground">
+        Message
+        <textarea
+          name="message"
+          rows="5"
+          minlength="10"
+          maxlength="5000"
+          required
+          class="w-full resize-y rounded-md border border-border bg-foreground/[0.03] px-3 py-2 font-normal text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        ></textarea>
+      </label>
+      <div class="absolute -left-[10000px] h-px w-px overflow-hidden" aria-hidden="true">
+        <label for="contact-website">Website</label>
+        <input id="contact-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          type="submit"
+          data-pending-label="Sending…"
+          class="min-h-[44px] w-full rounded-md bg-foreground px-4 py-2 font-medium text-background hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+        >
+          Send message
+        </button>
+        <p class="form-status text-sm" data-form-status role="status" aria-live="polite" hidden></p>
+      </div>
+    </form>
+  </section>
+
   <SiteFooter />
 </Layout>
 
 <script>
   import "../scripts/hover-list.ts";
+  import "../scripts/forms.ts";
 </script>

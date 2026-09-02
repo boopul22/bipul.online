@@ -45,7 +45,7 @@ const dateFmt = new Intl.DateTimeFormat("en-US", {
             data-hover-item
           >
             <a
-              class="flex flex-wrap items-center gap-x-2 px-2 py-1 text-foreground"
+              class="flex min-h-[44px] flex-wrap items-center gap-x-2 gap-y-1 px-2 py-2 text-foreground sm:min-h-0 sm:py-1"
               href={`/posts/${post.id}`}
             >
               <span class="font-medium">{post.data.title}</span>

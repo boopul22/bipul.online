@@ -5,15 +5,15 @@ interface Props {
 
 const { active = "home" } = Astro.props;
 
-const pill = "rounded-md px-2 py-1 font-medium bg-foreground/5 text-foreground hover:bg-foreground/5";
-const link = "rounded-md px-2 py-1 font-medium text-muted hover:bg-foreground/5 hover:text-foreground";
+const pill = "inline-flex min-h-[44px] items-center rounded-md bg-foreground/5 px-3 py-2 font-medium text-foreground hover:bg-foreground/5 sm:min-h-0 sm:px-2 sm:py-1";
+const link = "inline-flex min-h-[44px] items-center rounded-md px-3 py-2 font-medium text-muted hover:bg-foreground/5 hover:text-foreground sm:min-h-0 sm:px-2 sm:py-1";
 ---
 
 <header class="reveal flex items-center justify-between gap-4" style="--i: 0">
   <div class="flex min-w-0 items-center gap-2.5">
     <a
       href="/"
-      class="flex shrink-0 items-center gap-2.5 text-foreground"
+      class="flex min-h-[44px] shrink-0 items-center gap-2.5 text-foreground sm:min-h-0"
       aria-label="Bipul Kumar, home"
     >
       <span
@@ -22,13 +22,13 @@ const link = "rounded-md px-2 py-1 font-medium text-muted hover:bg-foreground/5 
       <span class="font-medium tracking-tight">Bipul Kumar</span>
     </a>
     <span
-      class="inline-flex items-center gap-1 text-sm text-muted tabular-nums"
+      class="hidden items-center gap-1 text-sm text-muted tabular-nums sm:inline-flex"
       title="People across my tools right now"
     >
       &middot; <span class="js-live">&hellip;</span> online
     </span>
   </div>
-  <nav class="flex shrink-0 items-center gap-1 text-sm">
+  <nav class="flex shrink-0 items-center gap-0.5 text-sm" aria-label="Primary navigation">
     <a href="/" aria-current={active === "home" ? "page" : undefined} class={active === "home" ? pill : link}>
       Home
     </a>

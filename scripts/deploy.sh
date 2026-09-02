@@ -10,18 +10,29 @@ cd "$(dirname "$0")/.."
 
 WORKER_NAME="bipulonline"
 SESSION_KV_ID="d357ef8dfd5e4f09b8e1393587fa8ab1"   # existing "bipulonline-session" namespace
+CONTACT_DESTINATION="blog.boopul@gmail.com"               # verified Cloudflare Email destination
+CONTACT_SENDER="website@bipul.online"                     # Cloudflare Email Sending domain
 
 echo "▶ Building…"
 npm run build
 
-echo "▶ Binding existing SESSION KV ($SESSION_KV_ID)…"
+echo "▶ Binding SESSION KV and Cloudflare Email…"
 node -e '
   const fs=require("fs"); const p="dist/server/wrangler.json";
-  const d=JSON.parse(fs.readFileSync(p,"utf8")); const id=process.argv[1];
+  const d=JSON.parse(fs.readFileSync(p,"utf8"));
+  const [id,destination,sender]=process.argv.slice(1);
   d.kv_namespaces=[{binding:"SESSION",id}];
-  if(d.previews) d.previews.kv_namespaces=[{binding:"SESSION",id}];
+  d.send_email=[{
+    name:"EMAIL",
+    destination_address:destination,
+    allowed_sender_addresses:[sender]
+  }];
+  if(d.previews) {
+    d.previews.kv_namespaces=[{binding:"SESSION",id}];
+    d.previews.send_email=d.send_email;
+  }
   fs.writeFileSync(p,JSON.stringify(d));
-' "$SESSION_KV_ID"
+' "$SESSION_KV_ID" "$CONTACT_DESTINATION" "$CONTACT_SENDER"
 
 echo "▶ Deploying to worker '$WORKER_NAME'…"
 # astro build drops a .wrangler/deploy/config.json whose base path conflicts

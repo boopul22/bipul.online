@@ -7,7 +7,7 @@ account. No consolidation or re-tagging: we just read each property by ID.
 ## How it works
 
 ```
-Browser → boopul.online (static, prerendered)
+Browser → bipul.online (static, prerendered)
    └─ src/scripts/live-traffic.ts  fetch('/api/traffic')
         └─ src/pages/api/traffic.ts   (SSR, prerender=false, @astrojs/cloudflare)
              └─ src/lib/ga.ts

@@ -9,7 +9,7 @@ import mdx from '@astrojs/mdx';
 // Pages are prerendered (static) by default; only routes that export
 // `prerender = false` (e.g. /api/traffic) run on-demand on Cloudflare.
 export default defineConfig({
-  site: 'https://boopul.online',
+  site: 'https://bipul.online',
   output: 'static',
   integrations: [mdx()],
   adapter: cloudflare({

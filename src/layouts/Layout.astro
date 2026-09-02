@@ -11,7 +11,7 @@ const {
   description = "I'm a generalist builder from India. I make small tools for practical problems and learn whatever each project requires. I put more faith in consistency than talent, and in doing the work rather than intending to do it.",
 } = Astro.props;
 
-const siteUrl = Astro.site ?? new URL("https://boopul.online");
+const siteUrl = Astro.site ?? new URL("https://bipul.online");
 const canonical = new URL(Astro.url.pathname, siteUrl).href;
 const ogImage = new URL("/profile.png", siteUrl).href;
 
@@ -75,7 +75,7 @@ const jsonLd = [
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
   </head>
   <body
-    class="mx-auto flex min-h-screen max-w-[42.5rem] flex-col gap-12 bg-background p-6 text-foreground md:py-8 lg:py-10"
+    class="mx-auto flex min-h-screen max-w-[42.5rem] flex-col gap-10 bg-background px-4 py-5 text-foreground sm:gap-12 sm:p-6 md:py-8 lg:py-10"
   >
     <slot />
     <script>
