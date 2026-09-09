@@ -75,4 +75,25 @@ export const projects: Project[] = [
     tagline: "Health, nutrition, and wellness tips based on evidence.",
     source: "cloudflare",
   },
+  {
+    name: "Catbin",
+    url: "https://catbin.pro/",
+    domain: "catbin.pro",
+    tagline: "Upload a file up to 200 MB and share it with an unlisted link.",
+    source: "cloudflare",
+  },
+  {
+    name: "Randomly",
+    url: "https://randomlydata.com/",
+    domain: "randomlydata.com",
+    tagline: "Generate random names, numbers, passwords, and more in your browser.",
+    source: "cloudflare",
+  },
+  {
+    name: "ShareVault",
+    url: "https://sharevault.in/",
+    domain: "sharevault.in",
+    tagline: "Copy-ready Instagram bios, WhatsApp lines, and daily updates.",
+    source: "cloudflare",
+  },
 ];
