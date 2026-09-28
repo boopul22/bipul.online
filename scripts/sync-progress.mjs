@@ -62,6 +62,7 @@ const args = new Set(process.argv.slice(2));
 const dryRun = args.has("--dry");
 const local = args.has("--local");
 const auto = args.has("--auto");
+const force = args.has("--force"); // with --auto: collect now, skip the 30-min wait
 
 const CHANGE_LABELS = {
   title_meta: "Titles and meta descriptions",
@@ -402,7 +403,7 @@ async function runAuto() {
 
   const justStarted = state.openSeoUp !== true;
   const due = now - (state.lastCollectAt ?? 0) >= COLLECT_EVERY_MS;
-  if (!justStarted && !due) return;
+  if (!justStarted && !due && !force) return;
 
   const payload = await collect();
   const hash = contentHash(payload);
@@ -413,7 +414,7 @@ async function runAuto() {
   if (changed || stale) {
     push(JSON.stringify(payload));
     writeState({ openSeoUp: true, lastCollectAt: now, lastPushAt: now, lastHash: hash });
-    const why = justStarted ? "OpenSEO started" : changed ? "data changed" : "refresh";
+    const why = justStarted ? "OpenSEO started" : force ? "manual run" : changed ? "data changed" : "refresh";
     console.log(`${stamp()} pushed ${summary} (${why})`);
   } else {
     writeState({ ...state, openSeoUp: true, lastCollectAt: now });

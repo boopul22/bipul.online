@@ -45,7 +45,7 @@ it stays up, and only writes to KV when something changed (or every 6 hours).
 ```sh
 npm run sync:agent -- status     # loaded? OpenSEO up? last sync
 npm run sync:agent -- logs       # follow ~/Library/Logs/com.bipul.progress-sync.log
-npm run sync:agent -- run        # check right now
+npm run sync:agent -- run        # sync right now
 npm run sync:agent -- install    # (re)install; uninstall removes it
 ```
 

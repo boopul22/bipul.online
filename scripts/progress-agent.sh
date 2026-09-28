@@ -9,7 +9,7 @@
 #   npm run sync:agent -- install     install (or reinstall) and start
 #   npm run sync:agent -- status      is it loaded, last result, last sync
 #   npm run sync:agent -- logs        follow the log
-#   npm run sync:agent -- run         trigger a check right now
+#   npm run sync:agent -- run         sync right now (skips the 30-min wait)
 #   npm run sync:agent -- uninstall   stop and remove
 set -euo pipefail
 
@@ -92,6 +92,9 @@ case "${1:-status}" in
   uninstall) uninstall ;;
   status) status ;;
   logs) touch "$LOG"; tail -n 50 -f "$LOG" ;;
-  run) launchctl kickstart -p "$DOMAIN/$LABEL" >/dev/null && echo "▶ Triggered; see: npm run sync:agent -- logs" ;;
+  run)
+    node "$ROOT/scripts/sync-progress.mjs" --auto --force 2>&1 | tee -a "$LOG"
+    [[ "${PIPESTATUS[0]}" -eq 0 ]] || exit 1
+    ;;
   *) echo "usage: npm run sync:agent -- install|status|logs|run|uninstall"; exit 1 ;;
 esac
