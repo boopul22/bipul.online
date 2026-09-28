@@ -1,0 +1,138 @@
+---
+// Caution-tape notice above the header: "Fun fact: I run all of this solo × <Claude Code>".
+// Icon: the Claude Code mark (claudecode-color.svg).
+---
+
+<aside class="solo-notice reveal" style="--i: 0" aria-label="Fun fact">
+  <span class="solo-tag">
+    <svg viewBox="0 0 24 24" class="size-3" aria-hidden="true">
+      <path d="M12 2 1 21h22L12 2Zm0 5.5L18.5 19h-13L12 7.5ZM11 10v4.5h2V10h-2Zm0 6v2h2v-2h-2Z" fill="currentColor"></path>
+    </svg>
+    Fun fact
+  </span>
+  <span class="solo-text">
+    I run all of this <strong>solo</strong>
+    <span class="solo-x" aria-hidden="true">&times;</span>
+    <svg class="solo-icon" role="img" aria-label="Claude Code" viewBox="0 0 24 24">
+      <title>Claude Code</title>
+      <path
+        clip-rule="evenodd"
+        fill-rule="evenodd"
+        fill="#D97757"
+        d="M20.998 10.949H24v3.102h-3v3.028h-1.487V20H18v-2.921h-1.487V20H15v-2.921H9V20H7.488v-2.921H6V20H4.487v-2.921H3V14.05H0V10.95h3V5h17.998v5.949zM6 10.949h1.488V8.102H6v2.847zm10.51 0H18V8.102h-1.49v2.847z"
+      ></path>
+    </svg>
+  </span>
+</aside>
+
+<style>
+  .solo-notice {
+    --amber: hsl(var(--theme-warning));
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    margin-bottom: -1rem;
+    border: 1px solid hsl(var(--theme-warning) / 0.45);
+    border-radius: 0.625rem;
+    /* Faint hazard stripes behind the text. */
+    background:
+      repeating-linear-gradient(
+        -45deg,
+        hsl(var(--theme-warning) / 0.07) 0 10px,
+        transparent 10px 20px
+      ),
+      hsl(var(--theme-warning) / 0.05);
+    background-size: 28.28px 28.28px, auto;
+    box-shadow:
+      0 0 0 3px hsl(var(--theme-warning) / 0.06),
+      0 8px 24px -12px hsl(var(--theme-warning) / 0.35);
+    font-size: 0.8125rem;
+    animation:
+      fade-up 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+      tape-drift 2.4s linear infinite;
+  }
+  @media (min-width: 640px) {
+    .solo-notice {
+      margin-bottom: -1.5rem;
+    }
+  }
+
+  /* Caution-tape label on the left. */
+  .solo-tag {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    background:
+      repeating-linear-gradient(-45deg, #111 0 6px, transparent 6px 12px) left / 8px 100% no-repeat,
+      var(--amber);
+    padding-left: 1rem;
+    color: #111;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+    padding-right: 1.1rem;
+  }
+
+  .solo-text {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    color: hsl(var(--theme-secondary));
+    white-space: nowrap;
+  }
+  .solo-text strong {
+    color: var(--amber);
+    font-weight: 700;
+  }
+  .solo-x {
+    color: hsl(var(--theme-muted));
+    font-size: 0.75rem;
+  }
+  .solo-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 6px rgb(217 119 87 / 0.45));
+    animation: mascot-hop 2.4s ease-in-out infinite;
+    transform-origin: 50% 100%;
+  }
+
+  @keyframes tape-drift {
+    to {
+      background-position: 28.28px 0, 0 0;
+    }
+  }
+  @keyframes mascot-hop {
+    0%, 70%, 100% {
+      transform: translateY(0) scale(1, 1);
+    }
+    78% {
+      transform: translateY(0) scale(1.12, 0.88);
+    }
+    86% {
+      transform: translateY(-4px) scale(0.94, 1.06);
+    }
+    94% {
+      transform: translateY(0) scale(1.05, 0.95);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .solo-notice {
+      opacity: 1;
+      animation: none;
+    }
+    .solo-icon {
+      animation: none;
+    }
+  }
+</style>

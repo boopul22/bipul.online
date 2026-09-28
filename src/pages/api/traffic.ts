@@ -3,6 +3,7 @@ import type { APIRoute } from "astro";
 // module, populated from .dev.vars locally and Pages secrets in production.
 import { env } from "cloudflare:workers";
 import { fetchTraffic } from "../../lib/ga";
+import { DEFAULT_PROPERTY_MAP } from "../../lib/ga-properties";
 
 // Server-rendered on demand (not prerendered at build time).
 export const prerender = false;
@@ -10,19 +11,6 @@ export const prerender = false;
 // Cache the live response at the edge so we don't hammer the GA4 API on every
 // page view — GA4 daily metrics don't change second-to-second anyway.
 const EDGE_TTL = 300; // seconds
-
-// Domain -> GA4 property id (Site_mine account). Non-secret, so it lives here
-// as the default; override via the GA_PROPERTY_MAP env var if it ever changes.
-const DEFAULT_PROPERTY_MAP: Record<string, string> = {
-  "freetexttospeech.net": "532702784",
-  "extractpics.com": "532556993",
-  "dailymeditationguide.com": "532892573",
-  "imagetourl.cloud": "523343886",
-  "freepromptbase.com": "525173786",
-  "imagepaste.org": "533689364",
-  "aigradecalculator.com": "539214928",
-  "myhealthbestie.com": "534588662",
-};
 
 export const GET: APIRoute = async () => {
   const e = env as Record<string, string | undefined>;

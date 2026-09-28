@@ -1,0 +1,71 @@
+---
+// Progress bar plus "Now" / "Next". `compact` is the card version: one line
+// of "Now", no "Next" list.
+import { STATUS, type ProgressStatus } from "../../lib/progress";
+
+interface Props {
+  label: string;
+  status: ProgressStatus;
+  progress: number | null;
+  now: string | null;
+  next?: string[];
+  compact?: boolean;
+}
+
+const { label, status, progress, now, next = [], compact = false } = Astro.props;
+const bar = STATUS[status].bar;
+---
+
+{
+  progress != null && (
+    <div class="flex items-center gap-3">
+      <div
+        class="h-1.5 flex-1 overflow-hidden rounded-full bg-foreground/10"
+        role="progressbar"
+        aria-label={`${label} progress`}
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={progress}
+      >
+        <div class={`h-full rounded-full ${bar}`} style={`width: ${progress}%`} />
+      </div>
+      <span class="text-sm font-medium text-foreground tabular-nums">{progress}%</span>
+    </div>
+  )
+}
+
+{
+  compact
+    ? now && (
+        <p class="line-clamp-2 text-sm text-secondary">
+          <span class="text-muted">Now:</span> {now}
+        </p>
+      )
+    : (now || next.length > 0) && (
+        <dl class="grid gap-x-4 gap-y-2 text-sm sm:grid-cols-[4.5rem_1fr]">
+          {now && (
+            <>
+              <dt class="text-muted">Now</dt>
+              <dd class="text-foreground">{now}</dd>
+            </>
+          )}
+          {next.length > 0 && (
+            <>
+              <dt class="text-muted">Next</dt>
+              <dd>
+                <ul class="flex flex-col gap-1 text-secondary">
+                  {next.map((item) => (
+                    <li class="flex gap-2">
+                      <span class="text-muted" aria-hidden="true">
+                        –
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </>
+          )}
+        </dl>
+      )
+}

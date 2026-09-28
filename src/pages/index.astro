@@ -2,10 +2,25 @@
 import Layout from "../layouts/Layout.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
+import ProjectStats from "../components/projects/ProjectStats.astro";
+import ProjectTabs from "../components/projects/ProjectTabs.astro";
 import { getCollection } from "astro:content";
-import { projects } from "../data/projects";
+import { loadProgress, mergeProgress, sortChannels } from "../lib/progress";
+
+// Rendered on request so the project cards show progress synced from
+// OpenSEO without a redeploy. The edge cache keeps KV reads cheap.
+export const prerender = false;
 
 const email = "hello@bipul.online";
+
+const payload = await loadProgress();
+const sites = mergeProgress(payload);
+const channels = sortChannels(payload);
+
+Astro.response.headers.set(
+  "cache-control",
+  "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
+);
 
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
@@ -17,15 +32,21 @@ const dateFmt = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
-// Staggered reveal indices continue across sections.
-const writingStart = 2 + projects.length;
-const elsewhereStart = writingStart + posts.length;
+const card = "rounded-xl border border-border bg-foreground/[0.02] p-4 sm:p-5";
+const sectionHead = "flex items-center justify-between gap-3";
+const moreLink =
+  "inline-flex min-h-[44px] items-center text-sm font-medium text-muted hover:text-foreground sm:min-h-0";
+const elsewhere = [
+  { label: "Email", prefix: "hello(at)", value: "bipul.online", href: `mailto:${email}`, external: false },
+  { label: "GitHub", prefix: "github.com/", value: "boopul22", href: "https://github.com/boopul22", external: true },
+  { label: "Instagram", prefix: "instagram.com/", value: "bipul.skill", href: "https://instagram.com/bipul.skill", external: true },
+];
 ---
 
 <Layout>
   <SiteHeader active="home" />
 
-  <section class="reveal flex flex-col items-start gap-4 sm:flex-row sm:gap-5" style="--i: 1">
+  <section class="reveal flex items-center gap-4 sm:gap-5" style="--i: 1">
     <img
       src="/profile.png"
       alt="Bipul Kumar"
@@ -35,179 +56,99 @@ const elsewhereStart = writingStart + posts.length;
       height="256"
       class="size-16 rounded-full ring-1 ring-border md:size-20"
     />
-    <div class="flex flex-col gap-1.5">
+    <div class="flex flex-col gap-1">
       <h1 class="text-lg font-semibold tracking-tight text-foreground md:text-xl">
         Bipul Kumar
       </h1>
-      <p class="text-secondary leading-relaxed">
-        I'm a generalist builder from India. I make small tools for practical
-        problems and learn whatever each project requires. I put more faith in
-        consistency than talent, and in doing the work rather than intending
-        to do it.
-      </p>
-      <p class="text-sm text-muted">
-        ~<span class="js-total">&hellip;</span> visits/mo across my tools
+      <p class="text-sm text-balance text-secondary">
+        Web Builder &bull; Automation &bull; SEO &bull; Social Media
       </p>
     </div>
   </section>
 
-  <section class="flex flex-col gap-3" id="about">
-    <div class="text-sm font-medium text-muted">
-      <h2>About</h2>
-    </div>
-    <div
-      class="flex flex-col gap-3 text-secondary leading-relaxed text-pretty tracking-[-0.005em]"
-    >
+  <ProjectStats sites={sites} channels={channels} class="reveal" style="--i: 2" />
+
+  <section class={`reveal flex flex-col gap-3 ${card}`} style="--i: 3" id="about">
+    <h2 class="text-sm font-medium text-muted">About</h2>
+    <div class="flex flex-col gap-3 text-secondary leading-relaxed text-pretty tracking-[-0.005em]">
       <p>
-        I paid my own way through college and taught myself the rest. I'm still
-        learning and building.
+        I build small, useful websites for everyday people: text-to-speech,
+        image tools, calculators, file sharing, and more. Each one is built
+        to scale, so it stays fast and cheap to run as traffic grows.
       </p>
       <p>
-        For each project, I learn what I need and ship it. So far that has meant
-        text-to-speech tools, image utilities, calculators, and prompt
-        libraries. I do it without a big team or funding, just steady work.
+        Most of the work behind them is automated. I set up SEO, content,
+        and social media workflows that run on their own, which is how one
+        person can run a dozen websites and a handful of YouTube channels.
+        When a project needs something new, I learn it, ship it, and keep
+        improving it.
       </p>
-      <p>
-        This site is where I keep what I've made. Most tools are free and fast,
-        and you can use them without making an account.
+      <p class="text-foreground">
+        My rule is simple: start small, stay consistent, build quietly, and
+        let the results make the noise.
       </p>
     </div>
   </section>
 
-  <section class="flex flex-col gap-3" id="projects">
-    <div class="text-sm font-medium text-muted">
-      <h2>Projects</h2>
+  <section class="reveal flex scroll-mt-8 flex-col gap-4" style="--i: 4" id="projects">
+    <div class={sectionHead}>
+      <h2 class="text-sm font-medium text-muted">Projects</h2>
+      <a href="/projects" class={moreLink}>All projects &rarr;</a>
     </div>
-    <ul class="relative isolate flex flex-col" data-hover-list>
-      <span
-        class="pointer-events-none absolute top-0 left-0 -z-10 rounded-md bg-foreground/[0.06] opacity-0"
-        data-hover-bg
-        aria-hidden="true"></span>
+    <ProjectTabs sites={sites} channels={channels} headingLevel="h3" synced={!!payload} limit={6} />
+  </section>
+
+  <section class="reveal flex flex-col gap-4" style="--i: 5" id="writing">
+    <div class={sectionHead}>
+      <h2 class="text-sm font-medium text-muted">Writing</h2>
+      <a href="/posts" class={moreLink}>All posts &rarr;</a>
+    </div>
+    <ul class="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-foreground/[0.02]">
       {
-        projects.map((project, i) => (
-          <li
-            class="reveal relative -mx-2 list-none rounded-md"
-            style={`--i: ${i + 2}`}
-            data-hover-item
-            data-domain={project.domain}
-          >
+        posts.slice(0, 5).map((post) => (
+          <li>
             <a
-              class="flex min-h-[44px] flex-wrap items-center gap-x-2 px-2 py-2 text-foreground sm:min-h-0 sm:py-1"
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={project.tagline}
-            >
-              <span class="font-medium">{project.name}</span>
-              <span class="hidden text-muted text-xs sm:inline">
-                &middot; {project.tagline}
-              </span>
-              <span
-                class="ml-auto inline-flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-muted tabular-nums"
-                title="Visitors in the last 28 days"
-              >
-                <span class="js-visits">&hellip;</span>
-                <span class="hidden sm:inline">/mo</span>
-              </span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </section>
-
-  <section class="flex flex-col gap-3" id="writing">
-    <div class="text-sm font-medium text-muted">
-      <h2>Writing</h2>
-    </div>
-    <ul class="relative isolate flex flex-col" data-hover-list>
-      <span
-        class="pointer-events-none absolute top-0 left-0 -z-10 rounded-md bg-foreground/[0.06] opacity-0"
-        data-hover-bg
-        aria-hidden="true"></span>
-      {
-        posts.map((post, i) => (
-          <li
-            class="reveal relative -mx-2 list-none rounded-md"
-            style={`--i: ${writingStart + i}`}
-            data-hover-item
-          >
-            <a
-              class="flex min-h-[44px] flex-wrap items-center gap-x-2 gap-y-1 px-2 py-2 text-foreground sm:min-h-0 sm:py-1"
+              class="group flex min-h-[44px] flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3 hover:bg-foreground/[0.04]"
               href={`/posts/${post.id}`}
             >
-              <span class="font-medium">{post.data.title}</span>
-              <span class="ml-auto inline-flex shrink-0 items-center gap-1 text-sm whitespace-nowrap text-muted tabular-nums">
-                <time datetime={post.data.pubDate.toISOString()}>
-                  {dateFmt.format(post.data.pubDate)}
-                </time>
+              <span class="font-medium text-foreground">{post.data.title}</span>
+              <time
+                class="ml-auto shrink-0 text-sm whitespace-nowrap text-muted tabular-nums"
+                datetime={post.data.pubDate.toISOString()}
+              >
+                {dateFmt.format(post.data.pubDate)}
+              </time>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="reveal flex flex-col gap-4" style="--i: 6" id="elsewhere">
+    <h2 class="text-sm font-medium text-muted">Elsewhere</h2>
+    <ul class="grid gap-2 sm:grid-cols-3">
+      {
+        elsewhere.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              class="flex h-full min-h-[44px] flex-col gap-0.5 rounded-xl border border-border bg-foreground/[0.02] px-4 py-3 transition-colors hover:border-foreground/25 hover:bg-foreground/[0.04]"
+            >
+              <span class="text-xs text-muted">{item.label}</span>
+              <span class="min-w-0 font-medium break-words text-foreground">
+                <span class="text-muted">{item.prefix}</span>
+                {item.value}
               </span>
             </a>
           </li>
         ))
       }
     </ul>
-    <a href="/posts" class="inline-flex min-h-[44px] items-center px-2 text-sm font-medium text-muted hover:text-foreground sm:min-h-0">
-      All posts &rarr;
-    </a>
   </section>
 
-  <section class="flex flex-col gap-3" id="elsewhere">
-    <div class="text-sm font-medium text-muted">
-      <h2>Elsewhere</h2>
-    </div>
-    <ul class="relative isolate flex flex-col" data-hover-list>
-      <span
-        class="pointer-events-none absolute top-0 left-0 -z-10 rounded-md bg-foreground/[0.06] opacity-0"
-        data-hover-bg
-        aria-hidden="true"></span>
-      <li
-        class="reveal relative -mx-2 list-none rounded-md"
-        style={`--i: ${elsewhereStart}`}
-        data-hover-item
-      >
-        <a class="flex min-h-[44px] min-w-0 items-center gap-x-2 px-2 py-2 text-foreground sm:min-h-0 sm:py-1" href={`mailto:${email}`}>
-          <span class="min-w-0 break-all font-medium sm:break-normal">
-            <span class="text-muted">hello(at)</span>bipul.online
-          </span>
-        </a>
-      </li>
-      <li
-        class="reveal relative -mx-2 list-none rounded-md"
-        style={`--i: ${elsewhereStart + 1}`}
-        data-hover-item
-      >
-        <a
-          class="flex min-h-[44px] min-w-0 items-center gap-x-2 px-2 py-2 text-foreground sm:min-h-0 sm:py-1"
-          href="https://github.com/boopul22"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="min-w-0 break-all font-medium sm:break-normal">
-            <span class="text-muted">github.com/</span>boopul22
-          </span>
-        </a>
-      </li>
-      <li
-        class="reveal relative -mx-2 list-none rounded-md"
-        style={`--i: ${elsewhereStart + 2}`}
-        data-hover-item
-      >
-        <a
-          class="flex min-h-[44px] min-w-0 items-center gap-x-2 px-2 py-2 text-foreground sm:min-h-0 sm:py-1"
-          href="https://instagram.com/bipul.skill"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="min-w-0 break-all font-medium sm:break-normal">
-            <span class="text-muted">instagram.com/</span>bipul.skill
-          </span>
-        </a>
-      </li>
-    </ul>
-  </section>
-
-  <section class="flex scroll-mt-8 flex-col gap-5" id="contact">
+  <section class={`reveal flex scroll-mt-8 flex-col gap-5 ${card}`} style="--i: 7" id="contact">
     <div class="flex flex-col gap-1">
       <h2 class="text-sm font-medium text-muted">Stay in touch</h2>
       <p class="text-secondary leading-relaxed">
@@ -319,6 +260,5 @@ const elsewhereStart = writingStart + posts.length;
 </Layout>
 
 <script>
-  import "../scripts/hover-list.ts";
   import "../scripts/forms.ts";
 </script>

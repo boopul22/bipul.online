@@ -1,6 +1,8 @@
 ---
+import SoloNotice from "./SoloNotice.astro";
+
 interface Props {
-  active?: "home" | "writing";
+  active?: "home" | "projects" | "writing";
 }
 
 const { active = "home" } = Astro.props;
@@ -8,6 +10,8 @@ const { active = "home" } = Astro.props;
 const pill = "inline-flex min-h-[44px] items-center rounded-md bg-foreground/5 px-3 py-2 font-medium text-foreground hover:bg-foreground/5 sm:min-h-0 sm:px-2 sm:py-1";
 const link = "inline-flex min-h-[44px] items-center rounded-md px-3 py-2 font-medium text-muted hover:bg-foreground/5 hover:text-foreground sm:min-h-0 sm:px-2 sm:py-1";
 ---
+
+<SoloNotice />
 
 <header class="reveal flex items-center justify-between gap-4" style="--i: 0">
   <div class="flex min-w-0 items-center gap-2.5">
@@ -31,6 +35,14 @@ const link = "inline-flex min-h-[44px] items-center rounded-md px-3 py-2 font-me
   <nav class="flex shrink-0 items-center gap-0.5 text-sm" aria-label="Primary navigation">
     <a href="/" aria-current={active === "home" ? "page" : undefined} class={active === "home" ? pill : link}>
       Home
+    </a>
+    <span class="text-border" aria-hidden="true">·</span>
+    <a
+      href="/projects"
+      aria-current={active === "projects" ? "page" : undefined}
+      class={active === "projects" ? pill : link}
+    >
+      Projects
     </a>
     <span class="text-border" aria-hidden="true">·</span>
     <a

@@ -1,0 +1,17 @@
+---
+import { STATUS, type ProgressStatus } from "../../lib/progress";
+
+interface Props {
+  status: ProgressStatus;
+}
+
+const { status } = Astro.props;
+const s = STATUS[status];
+---
+
+<span
+  class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border px-2 py-0.5 text-xs font-medium text-secondary"
+>
+  <span class={`inline-block size-1.5 rounded-full ${s.dot}`} aria-hidden="true"></span>
+  {s.label}
+</span>

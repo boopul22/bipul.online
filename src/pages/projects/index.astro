@@ -1,0 +1,55 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+import ProjectStats from "../../components/projects/ProjectStats.astro";
+import ProjectTabs from "../../components/projects/ProjectTabs.astro";
+import { loadProgress, mergeProgress, sortChannels } from "../../lib/progress";
+
+// Rendered on request so progress synced from OpenSEO shows up without a
+// redeploy. The edge cache keeps KV reads cheap.
+export const prerender = false;
+
+const payload = await loadProgress();
+const sites = mergeProgress(payload);
+const channels = sortChannels(payload);
+
+Astro.response.headers.set(
+  "cache-control",
+  "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
+);
+
+const fullFmt = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+---
+
+<Layout
+  title="Projects | Bipul Kumar"
+  description="The websites and YouTube channels I'm running, how far along each one is, and what I've shipped recently."
+>
+  <SiteHeader active="projects" />
+
+  <section class="reveal flex flex-col gap-1.5" style="--i: 1">
+    <h1 class="text-xl font-semibold tracking-tight text-foreground">Projects</h1>
+    <p class="text-secondary">What I'm building, how far along it is, and what shipped lately.</p>
+    {
+      payload?.syncedAt && (
+        <p class="text-sm text-muted">
+          Updated <time datetime={payload.syncedAt}>{fullFmt.format(new Date(payload.syncedAt))}</time>
+        </p>
+      )
+    }
+  </section>
+
+  <ProjectStats sites={sites} channels={channels} class="reveal" style="--i: 2" />
+
+  <section class="reveal flex flex-col gap-4" style="--i: 3">
+    <ProjectTabs sites={sites} channels={channels} synced={!!payload} />
+  </section>
+
+  <SiteFooter />
+</Layout>

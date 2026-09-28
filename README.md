@@ -19,6 +19,40 @@ npx wrangler kv key list --namespace-id d357ef8dfd5e4f09b8e1393587fa8ab1 --prefi
 npx wrangler kv key list --namespace-id d357ef8dfd5e4f09b8e1393587fa8ab1 --prefix subscriber:
 ```
 
+## Project progress (/projects)
+
+The homepage and `/projects` show tabbed cards for every website and YouTube
+channel, each linking to a detail page (`/projects/<name>`,
+`/projects/youtube/<handle>`) with status, progress, what's next, stats and
+recent activity. The data lives in the local OpenSEO instance
+(`localhost:8741`): each project has a **Public progress** custom context
+section (slug `public-progress`); websites add their change log, channels
+their YouTube stats. OpenSEO itself is never exposed.
+`npm run sync:progress` reads it and writes only the public fields to the
+`progress:v1` key in `SESSION` KV, which the pages read on request
+(edge-cached for 5 minutes).
+
+```sh
+npm run sync:progress            # push to production KV
+npm run sync:progress -- --dry   # preview the payload
+npm run sync:progress -- --local # push to the local `astro dev` KV
+```
+
+Syncing is automatic: a launchd agent (`com.bipul.progress-sync`) checks every
+5 minutes, syncs as soon as OpenSEO is up, re-collects every 30 minutes while
+it stays up, and only writes to KV when something changed (or every 6 hours).
+
+```sh
+npm run sync:agent -- status     # loaded? OpenSEO up? last sync
+npm run sync:agent -- logs       # follow ~/Library/Logs/com.bipul.progress-sync.log
+npm run sync:agent -- run        # check right now
+npm run sync:agent -- install    # (re)install; uninstall removes it
+```
+
+The format is documented at the top of `scripts/sync-progress.mjs`. Deleting
+a project's section hides it; `changes: full` also publishes change-log
+summaries (off by default, since they're written as SEO notes).
+
 ## Development
 
 ```sh

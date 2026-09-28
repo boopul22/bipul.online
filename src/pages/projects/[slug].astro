@@ -1,0 +1,199 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SiteHeader from "../../components/SiteHeader.astro";
+import SiteFooter from "../../components/SiteFooter.astro";
+import StatusPill from "../../components/projects/StatusPill.astro";
+import ProgressBlock from "../../components/projects/ProgressBlock.astro";
+import StatTile from "../../components/projects/StatTile.astro";
+import { faviconUrl, loadProgress, mergeProgress } from "../../lib/progress";
+import { DEFAULT_PROPERTY_MAP } from "../../lib/ga-properties";
+
+export const prerender = false;
+
+const payload = await loadProgress();
+const sites = mergeProgress(payload);
+const index = sites.findIndex((s) => s.slug === Astro.params.slug);
+if (index < 0) return new Response("Not found", { status: 404 });
+
+const site = sites[index];
+const p = site.progress;
+const status = p?.status ?? "live";
+const tracked = site.domain in DEFAULT_PROPERTY_MAP;
+const about = p?.about || site.tagline;
+const others = [...sites.slice(index + 1), ...sites.slice(0, index)].slice(0, 3);
+
+Astro.response.headers.set(
+  "cache-control",
+  "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
+);
+
+const dayFmt = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const fmtDay = (d: string) => dayFmt.format(new Date(`${d}T00:00:00Z`));
+const section = "flex flex-col gap-3 rounded-xl border border-border bg-foreground/[0.02] p-4 sm:p-5";
+---
+
+<Layout title={`${site.name} | Projects | Bipul Kumar`} description={about}>
+  <SiteHeader active="projects" />
+
+  <div class="flex flex-col gap-6" data-domain={site.domain}>
+    <nav class="reveal -mb-2" style="--i: 1" aria-label="Breadcrumb">
+      <a
+        href="/projects"
+        class="inline-flex min-h-[44px] items-center gap-1 text-sm text-muted hover:text-foreground sm:min-h-0"
+      >
+        &larr; All projects
+      </a>
+    </nav>
+
+    <header class="reveal flex flex-col gap-4" style="--i: 2">
+      <div class="flex items-start gap-3 sm:gap-4">
+        <img
+          src={faviconUrl(site)}
+          alt=""
+          width="48"
+          height="48"
+          class="size-12 shrink-0 rounded-xl border border-border bg-foreground/5 p-2"
+        />
+        <div class="flex min-w-0 flex-1 flex-col gap-1">
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <h1 class="text-xl font-semibold tracking-tight text-foreground">{site.name}</h1>
+            <StatusPill status={status} />
+          </div>
+          <p class="truncate text-sm text-muted">{site.domain}</p>
+        </div>
+      </div>
+
+      {about && <p class="text-secondary leading-relaxed">{about}</p>}
+
+      <a
+        href={site.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 sm:w-fit"
+      >
+        Visit {site.domain} <span aria-hidden="true">&nearr;</span>
+      </a>
+    </header>
+
+    <section class="reveal grid grid-cols-2 gap-2 sm:grid-cols-4" style="--i: 3" aria-label="Stats">
+      <StatTile label="Visitors (28 days)">
+        {tracked ? <span class="js-visits">&hellip;</span> : "–"}
+      </StatTile>
+      <StatTile label="Online now" hint="Active in the last 30 minutes">
+        {tracked ? <span class="js-active">&hellip;</span> : "–"}
+      </StatTile>
+      <StatTile label="Progress">{p?.progress != null ? `${p.progress}%` : "–"}</StatTile>
+      <StatTile label="Last update">{p?.updatedAt ? fmtDay(p.updatedAt).replace(/, \d{4}$/, "") : "–"}</StatTile>
+    </section>
+
+    {
+      tracked && (
+        <section class={`reveal ${section}`} style="--i: 4">
+          <h2 class="text-sm font-medium text-muted">Daily visitors, last 28 days</h2>
+          <div class="relative" data-trend-wrap data-loading>
+            <svg
+              class="js-trend h-24 w-full text-success"
+              viewBox="0 0 100 32"
+              preserveAspectRatio="none"
+              role="img"
+              aria-label="Daily visitors chart, loading"
+            >
+              <path class="js-trend-area" fill="currentColor" fill-opacity="0.12" d="" />
+              <path
+                class="js-trend-line"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                vector-effect="non-scaling-stroke"
+                stroke-linejoin="round"
+                d=""
+              />
+            </svg>
+            <span class="trend-loading absolute inset-0 grid place-items-center text-xs text-muted">
+              Loading traffic&hellip;
+            </span>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      p && (p.progress != null || p.now || p.next.length > 0) && (
+        <section class={`reveal ${section}`} style="--i: 5">
+          <h2 class="text-sm font-medium text-muted">Progress</h2>
+          <ProgressBlock label={site.name} status={status} progress={p.progress} now={p.now} next={p.next} />
+        </section>
+      )
+    }
+
+    {
+      p && p.changes.length > 0 && (
+        <section class={`reveal ${section}`} style="--i: 6">
+          <h2 class="text-sm font-medium text-muted">Recently shipped</h2>
+          <ol class="flex flex-col">
+            {p.changes.map((c, i) => (
+              <li class="relative flex gap-3 pb-4 last:pb-0">
+                {i < p.changes.length - 1 && (
+                  <span class="absolute top-3 bottom-0 left-[3.5px] w-px bg-border" aria-hidden="true" />
+                )}
+                <span class="mt-1.5 size-2 shrink-0 rounded-full bg-success" aria-hidden="true" />
+                <div class="flex min-w-0 flex-col gap-0.5">
+                  <span class="text-sm text-foreground">
+                    {c.label}
+                    {c.pages > 0 && (
+                      <span class="text-muted">
+                        {" "}&middot; {c.pages} {c.pages === 1 ? "page" : "pages"}
+                      </span>
+                    )}
+                  </span>
+                  <time class="text-xs text-muted" datetime={c.date}>
+                    {fmtDay(c.date)}
+                  </time>
+                  {c.summary && <p class="text-sm text-secondary">{c.summary}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )
+    }
+
+    {
+      others.length > 0 && (
+        <section class="reveal flex flex-col gap-2" style="--i: 7">
+          <h2 class="text-sm font-medium text-muted">More projects</h2>
+          <ul class="flex flex-col gap-2">
+            {others.map((o) => (
+              <li>
+                <a
+                  href={`/projects/${o.slug}`}
+                  class="flex min-h-[44px] items-center gap-3 rounded-lg border border-border px-3 py-2 hover:border-foreground/25 hover:bg-foreground/[0.04]"
+                >
+                  <img src={faviconUrl(o)} alt="" width="20" height="20" loading="lazy" class="size-5 rounded" />
+                  <span class="font-medium text-foreground">{o.name}</span>
+                  <span class="hidden min-w-0 truncate text-sm text-muted sm:inline">{o.tagline}</span>
+                  <span class="ml-auto text-muted" aria-hidden="true">
+                    &rarr;
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  [data-trend-wrap]:not([data-loading]) .trend-loading {
+    display: none;
+  }
+</style>

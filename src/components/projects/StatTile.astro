@@ -1,0 +1,16 @@
+---
+interface Props {
+  label: string;
+  hint?: string;
+}
+
+const { label, hint } = Astro.props;
+---
+
+<div class="flex min-w-0 flex-col gap-1 rounded-lg border border-border bg-foreground/[0.02] p-3" title={hint}>
+  <span class="truncate text-xs text-muted">{label}</span>
+  <span class="text-lg font-semibold tracking-tight text-foreground tabular-nums">
+    <slot />
+  </span>
+  {Astro.slots.has("sub") && <span class="text-xs text-muted tabular-nums"><slot name="sub" /></span>}
+</div>

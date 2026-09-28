@@ -1,0 +1,24 @@
+---
+// "At a glance" tiles: site count, live visitors/month, channels, subscribers.
+import StatTile from "./StatTile.astro";
+import { fmtCompact, type Channel, type ProjectWithProgress } from "../../lib/progress";
+
+interface Props {
+  sites: ProjectWithProgress[];
+  channels: Channel[];
+  class?: string;
+  style?: string;
+}
+
+const { sites, channels, class: className = "", style } = Astro.props;
+const totalSubs = channels.reduce((a, c) => a + (c.stats.subscribers ?? 0), 0);
+---
+
+<section class={`grid grid-cols-2 gap-2 sm:grid-cols-4 ${className}`} style={style} aria-label="At a glance">
+  <StatTile label="Websites">{sites.length}</StatTile>
+  <StatTile label="Visitors / month" hint="Across all websites, last 28 days">
+    <span class="js-total">&hellip;</span>
+  </StatTile>
+  <StatTile label="YouTube channels">{channels.length}</StatTile>
+  <StatTile label="Subscribers" hint="Across all channels">{fmtCompact(totalSubs)}</StatTile>
+</section>

@@ -10,7 +10,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "deploy": "bash scripts/deploy.sh",
-    "astro": "astro"
+    "astro": "astro",
+    "sync:progress": "node scripts/sync-progress.mjs",
+    "sync:agent": "bash scripts/progress-agent.sh"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^13.7.0",

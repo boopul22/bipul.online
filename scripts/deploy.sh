@@ -9,6 +9,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 WORKER_NAME="bipulonline"
+# The wrangler login spans two accounts; the worker lives on this one.
+export CLOUDFLARE_ACCOUNT_ID="${CLOUDFLARE_ACCOUNT_ID:-ab54ca2d01df4886aa0c3f240ace806d}"
 SESSION_KV_ID="d357ef8dfd5e4f09b8e1393587fa8ab1"   # existing "bipulonline-session" namespace
 CONTACT_DESTINATION="blog.boopul@gmail.com"               # verified Cloudflare Email destination
 CONTACT_SENDER="website@bipul.online"                     # Cloudflare Email Sending domain

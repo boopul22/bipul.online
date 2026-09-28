@@ -1,0 +1,199 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import SiteHeader from "../../../components/SiteHeader.astro";
+import SiteFooter from "../../../components/SiteFooter.astro";
+import StatusPill from "../../../components/projects/StatusPill.astro";
+import ProgressBlock from "../../../components/projects/ProgressBlock.astro";
+import StatTile from "../../../components/projects/StatTile.astro";
+import {
+  channelSlug,
+  channelUrl,
+  fmtCompact,
+  loadProgress,
+  pctChange,
+  sortChannels,
+} from "../../../lib/progress";
+
+export const prerender = false;
+
+const payload = await loadProgress();
+const channels = sortChannels(payload);
+const index = channels.findIndex((c) => channelSlug(c) === Astro.params.handle?.toLowerCase());
+if (index < 0) return new Response("Not found", { status: 404 });
+
+const c = channels[index];
+const s = c.stats;
+const viewsDelta = pctChange(s.views28d, s.views28dPrev);
+const about = c.about || c.tagline;
+const others = [...channels.slice(index + 1), ...channels.slice(0, index)].slice(0, 3);
+const avatar = (size: number) => c.avatar?.replace(/=s\d+-/, `=s${size}-`);
+
+Astro.response.headers.set(
+  "cache-control",
+  "public, max-age=60, s-maxage=300, stale-while-revalidate=600",
+);
+
+const dayFmt = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const section = "flex flex-col gap-3 rounded-xl border border-border bg-foreground/[0.02] p-4 sm:p-5";
+const signed = (n: number) => `${n > 0 ? "+" : ""}${n.toLocaleString("en-US")}`;
+---
+
+<Layout
+  title={`${c.title} | YouTube | Bipul Kumar`}
+  description={about ?? `${c.title} on YouTube: ${fmtCompact(s.subscribers)} subscribers and ${fmtCompact(s.videos)} videos.`}
+>
+  <SiteHeader active="projects" />
+
+  <div class="flex flex-col gap-6">
+    <nav class="reveal -mb-2" style="--i: 1" aria-label="Breadcrumb">
+      <a
+        href="/projects?tab=youtube"
+        class="inline-flex min-h-[44px] items-center gap-1 text-sm text-muted hover:text-foreground sm:min-h-0"
+      >
+        &larr; All channels
+      </a>
+    </nav>
+
+    <header class="reveal flex flex-col gap-4" style="--i: 2">
+      <div class="flex items-start gap-3 sm:gap-4">
+        {
+          c.avatar ? (
+            <img
+              src={avatar(112)}
+              alt=""
+              width="56"
+              height="56"
+              referrerpolicy="no-referrer"
+              class="size-14 shrink-0 rounded-full border border-border bg-foreground/5"
+            />
+          ) : (
+            <span class="size-14 shrink-0 rounded-full bg-foreground/10" />
+          )
+        }
+        <div class="flex min-w-0 flex-1 flex-col gap-1">
+          <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+            <h1 class="text-xl font-semibold tracking-tight text-foreground">{c.title}</h1>
+            <StatusPill status={c.status} />
+          </div>
+          <p class="truncate text-sm text-muted">
+            {c.handle ?? "YouTube channel"} &middot; {fmtCompact(s.subscribers)} subscribers
+          </p>
+        </div>
+      </div>
+
+      {about && <p class="text-secondary leading-relaxed">{about}</p>}
+
+      <a
+        href={channelUrl(c)}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 sm:w-fit"
+      >
+        Open on YouTube <span aria-hidden="true">&nearr;</span>
+      </a>
+    </header>
+
+    <section class="reveal flex flex-col gap-2" style="--i: 3" aria-label="Channel stats">
+      <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <StatTile label="Subscribers">{fmtCompact(s.subscribers)}</StatTile>
+        <StatTile label="Total views">{fmtCompact(s.views)}</StatTile>
+        <StatTile label="Videos">{fmtCompact(s.videos)}</StatTile>
+        <StatTile label="Views (28 days)">
+          {fmtCompact(s.views28d)}
+          {
+            viewsDelta != null && (
+              <span slot="sub" class={viewsDelta >= 0 ? "text-success" : "text-[hsl(0_72%_64%)]"}>
+                {`${viewsDelta >= 0 ? "+" : ""}${viewsDelta}% vs previous 28 days`}
+              </span>
+            )
+          }
+        </StatTile>
+        <StatTile label="Watch hours (28 days)">{fmtCompact(s.watchHours28d)}</StatTile>
+        <StatTile label="Net subscribers (28 days)">
+          {s.subscribers28d != null ? signed(s.subscribers28d) : "–"}
+        </StatTile>
+      </div>
+    </section>
+
+    {
+      c.latestVideo && (
+        <section class={`reveal ${section}`} style="--i: 4">
+          <h2 class="text-sm font-medium text-muted">Latest upload</h2>
+          <a
+            href={`https://www.youtube.com/watch?v=${c.latestVideo.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="group flex flex-col gap-3 sm:flex-row sm:items-start"
+          >
+            <img
+              src={`https://i.ytimg.com/vi/${c.latestVideo.id}/mqdefault.jpg`}
+              alt=""
+              width="320"
+              height="180"
+              loading="lazy"
+              class="aspect-video w-full shrink-0 rounded-lg border border-border object-cover sm:w-56"
+            />
+            <div class="flex min-w-0 flex-col gap-1">
+              <span class="font-medium text-foreground group-hover:opacity-80">{c.latestVideo.title}</span>
+              <span class="text-sm text-muted">
+                {dayFmt.format(new Date(c.latestVideo.publishedAt))} &middot;{" "}
+                {c.latestVideo.views.toLocaleString("en-US")} views
+              </span>
+            </div>
+          </a>
+        </section>
+      )
+    }
+
+    {
+      (c.progress != null || c.now || c.next.length > 0) && (
+        <section class={`reveal ${section}`} style="--i: 5">
+          <h2 class="text-sm font-medium text-muted">Progress</h2>
+          <ProgressBlock label={c.title} status={c.status} progress={c.progress} now={c.now} next={c.next} />
+        </section>
+      )
+    }
+
+    {
+      others.length > 0 && (
+        <section class="reveal flex flex-col gap-2" style="--i: 6">
+          <h2 class="text-sm font-medium text-muted">More channels</h2>
+          <ul class="flex flex-col gap-2">
+            {others.map((o) => (
+              <li>
+                <a
+                  href={`/projects/youtube/${channelSlug(o)}`}
+                  class="flex min-h-[44px] items-center gap-3 rounded-lg border border-border px-3 py-2 hover:border-foreground/25 hover:bg-foreground/[0.04]"
+                >
+                  {o.avatar && (
+                    <img
+                      src={o.avatar.replace(/=s\d+-/, "=s40-")}
+                      alt=""
+                      width="20"
+                      height="20"
+                      loading="lazy"
+                      referrerpolicy="no-referrer"
+                      class="size-5 rounded-full"
+                    />
+                  )}
+                  <span class="font-medium text-foreground">{o.title}</span>
+                  <span class="text-sm text-muted tabular-nums">{fmtCompact(o.stats.subscribers)} subs</span>
+                  <span class="ml-auto text-muted" aria-hidden="true">
+                    &rarr;
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </div>
+
+  <SiteFooter />
+</Layout>
