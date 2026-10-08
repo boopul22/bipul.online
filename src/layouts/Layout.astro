@@ -4,16 +4,24 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  /** Site-relative or absolute image for Open Graph / Twitter cards. */
+  image?: string;
+  ogType?: "website" | "article";
+  /** Extra JSON-LD objects for this page (Article, FAQPage, ...). */
+  schema?: object[];
 }
 
 const {
   title = "Bipul Kumar | Websites, automation and SEO",
   description = "Builder from India. I make small, useful websites that scale, and automate the SEO, content and social media behind them.",
+  image,
+  ogType = "website",
+  schema = [],
 } = Astro.props;
 
 const siteUrl = Astro.site ?? new URL("https://bipul.online");
 const canonical = new URL(Astro.url.pathname, siteUrl).href;
-const ogImage = new URL("/profile.png", siteUrl).href;
+const ogImage = new URL(image ?? "/profile.png", siteUrl).href;
 
 const jsonLd = [
   {
@@ -34,6 +42,7 @@ const jsonLd = [
     name: "Bipul Kumar",
     url: siteUrl.href,
   },
+  ...schema,
 ];
 ---
 
@@ -52,7 +61,7 @@ const jsonLd = [
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content="Bipul Kumar" />
 

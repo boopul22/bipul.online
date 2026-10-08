@@ -1,0 +1,93 @@
+---
+// Instagram link-in-bio page (bipul.online/links). Built from the guides
+// collection, so the newest guide is always on top after each deploy.
+import { getCollection } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+
+const guides = (await getCollection("guides", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const latest = guides[0];
+
+const dateFmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric" });
+const row = "flex min-h-[44px] items-center gap-3 rounded-lg px-2 py-2 hover:bg-foreground/5";
+const chip = "inline-flex min-h-[40px] items-center justify-center gap-1 rounded-md px-2.5 py-1.5 text-center text-xs font-medium transition-opacity hover:opacity-85";
+---
+
+<Layout
+  title="Links | Bipul Kumar (@bipul.skill)"
+  description="Every guide, tool and download from my Instagram posts, newest first."
+  image={latest?.data.coverWide ?? latest?.data.cover}
+>
+  <header class="reveal flex flex-col gap-3 pt-2" style="--i: 0">
+    <div class="flex items-center gap-3">
+      <img src="/profile.png" alt="Bipul Kumar" width="48" height="48" class="size-12 shrink-0 rounded-full border border-border object-cover" />
+      <div class="flex min-w-0 flex-col">
+        <h1 class="font-semibold tracking-tight text-foreground">Bipul Kumar</h1>
+        <a class="text-sm text-muted hover:text-foreground" href="https://instagram.com/bipul.skill" target="_blank" rel="noopener">@bipul.skill</a>
+      </div>
+    </div>
+    <p class="text-sm leading-relaxed text-secondary">
+      What happened in AI, and what it means for you. Every post's full guide and downloads, newest first.
+    </p>
+  </header>
+
+  <section class="reveal flex flex-col gap-1" style="--i: 1" aria-labelledby="posts">
+    <h2 id="posts" class="text-sm font-medium text-muted">From my posts</h2>
+    <ul class="flex flex-col">
+      {guides.map((g, i) => (
+        <li class="flex list-none flex-col gap-2.5 border-b border-border py-3 last:border-b-0">
+          <a href={`/${g.id}`} class="group flex gap-3">
+            <img
+              src={g.data.coverWide ?? g.data.cover}
+              alt=""
+              width="112"
+              height="84"
+              loading={i < 4 ? "eager" : "lazy"}
+              class="h-[84px] w-28 shrink-0 rounded-md border border-border object-cover group-hover:opacity-85"
+            />
+            <span class="flex min-w-0 flex-1 flex-col justify-center gap-1">
+              <span class="line-clamp-3 font-medium leading-snug text-foreground group-hover:underline underline-offset-4">{g.data.title}</span>
+              <span class="flex items-center gap-1.5 text-xs text-muted tabular-nums">
+                {i === 0 && <span class="rounded bg-success/15 px-1.5 font-medium text-success">New</span>}
+                <time datetime={g.data.pubDate.toISOString()}>{dateFmt.format(g.data.pubDate)}</time>
+              </span>
+            </span>
+          </a>
+          <div class="grid grid-cols-2 gap-1.5">
+            <a href={g.data.primary.url} target="_blank" rel="noopener" class={`${chip} col-span-2 bg-foreground text-background`}>
+              {g.data.primary.label} <span aria-hidden="true">&#8599;</span>
+            </a>
+            {g.data.secondary && (
+              <a href={g.data.secondary.url} target="_blank" rel="noopener" class={`${chip} border border-border text-foreground`}>
+                {g.data.secondary.label} <span aria-hidden="true">&#8599;</span>
+              </a>
+            )}
+            <a href={`/${g.id}`} class={`${chip} border border-border text-foreground ${g.data.secondary ? "" : "col-span-2"}`}>Read the guide</a>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="reveal flex flex-col gap-1" style="--i: 2" aria-labelledby="more">
+    <h2 id="more" class="text-sm font-medium text-muted">More</h2>
+    <ul class="-mx-2 flex flex-col">
+      <li class="list-none border-b border-border">
+        <a href="https://instagram.com/bipul.skill" target="_blank" rel="noopener" class={row}>
+          <span class="flex-1 text-sm font-medium text-foreground">Instagram</span>
+          <span class="text-muted" aria-hidden="true">&#8599;</span>
+        </a>
+      </li>
+      <li class="list-none">
+        <a href="/" class={row}>
+          <span class="flex-1 text-sm font-medium text-foreground">My website and projects</span>
+          <span class="text-muted" aria-hidden="true">&rsaquo;</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <SiteFooter />
+</Layout>

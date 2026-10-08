@@ -1,0 +1,153 @@
+---
+// Guide pages: bipul.online/<guide-file-name>, one per Instagram carousel.
+// Static routes (/, /posts, /projects, /links …) always win over this one.
+import type { CollectionEntry } from "astro:content";
+import { getCollection, render } from "astro:content";
+import Layout from "../layouts/Layout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+
+export async function getStaticPaths() {
+  const guides = await getCollection("guides", ({ data }) => !data.draft);
+  return guides.map((guide) => ({ params: { slug: guide.id }, props: { guide } }));
+}
+
+interface Props {
+  guide: CollectionEntry<"guides">;
+}
+
+const { guide } = Astro.props;
+const { Content } = await render(guide);
+const d = guide.data;
+const hero = d.coverWide ?? d.cover;
+
+const siteUrl = Astro.site ?? new URL("https://bipul.online");
+const pageUrl = new URL(`/${guide.id}`, siteUrl).href;
+const dateFmt = new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" });
+
+const schema: object[] = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: d.title,
+    description: d.description,
+    image: new URL(hero, siteUrl).href,
+    datePublished: d.pubDate.toISOString(),
+    dateModified: (d.updated ?? d.pubDate).toISOString(),
+    author: { "@type": "Person", name: "Bipul Kumar", url: siteUrl.href },
+    mainEntityOfPage: pageUrl,
+    keywords: d.keyword,
+  },
+];
+if (d.faq.length) {
+  schema.push({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: d.faq.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  });
+}
+
+const btn = "inline-flex min-h-[44px] items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-opacity hover:opacity-85";
+---
+
+<Layout title={`${d.title} | Bipul Kumar`} description={d.description} image={hero} ogType="article" schema={schema}>
+  <SiteHeader active="writing" />
+
+  <article class="flex flex-col gap-8">
+    <figure class="reveal -mx-1 overflow-hidden rounded-lg border border-border sm:mx-0" style="--i: 1">
+      <img src={hero} alt={d.coverAlt} width={d.coverWide ? 1600 : 1080} height={d.coverWide ? 1200 : 1440} fetchpriority="high" class="block w-full" />
+    </figure>
+
+    <header class="reveal flex flex-col gap-3" style="--i: 1">
+      <p class="text-sm text-muted">
+        Guide &middot;
+        <time datetime={d.pubDate.toISOString()}>{dateFmt.format(d.pubDate)}</time>
+        {d.updated && <> &middot; updated <time datetime={d.updated.toISOString()}>{dateFmt.format(d.updated)}</time></>}
+      </p>
+      <h1 class="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{d.title}</h1>
+      <p class="leading-relaxed text-secondary">{d.description}</p>
+      <div class="mt-1 flex flex-wrap gap-2">
+        <a class={`${btn} bg-foreground text-background`} href={d.primary.url} target="_blank" rel="noopener">
+          {d.primary.label} <span aria-hidden="true">&#8599;</span>
+        </a>
+        {d.secondary && (
+          <a class={`${btn} border border-border text-foreground`} href={d.secondary.url} target="_blank" rel="noopener">
+            {d.secondary.label} <span aria-hidden="true">&#8599;</span>
+          </a>
+        )}
+        {d.instagramUrl && (
+          <a class={`${btn} border border-border text-foreground`} href={d.instagramUrl} target="_blank" rel="noopener">
+            See the Instagram post
+          </a>
+        )}
+      </div>
+    </header>
+
+    <section class="reveal rounded-lg border border-border p-4 sm:p-5" style="--i: 2" aria-labelledby="tldr">
+      <h2 id="tldr" class="mb-2 text-sm font-medium text-muted">Quick summary</h2>
+      <ul class="flex list-disc flex-col gap-1.5 pl-5 leading-relaxed text-secondary">
+        {d.tldr.map((t) => <li>{t}</li>)}
+      </ul>
+    </section>
+
+    {d.tools.length > 0 && (
+      <section class="reveal flex flex-col gap-3" style="--i: 3" aria-labelledby="tools">
+        <h2 id="tools" class="text-sm font-medium text-muted">The tools</h2>
+        <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {d.tools.map((t) => (
+            <li class="list-none">
+              <a class="flex min-h-[44px] items-center gap-3 rounded-lg border border-border p-3 hover:bg-foreground/5" href={t.url} target="_blank" rel="noopener">
+                {t.icon && <img src={t.icon} alt="" width="44" height="44" loading="lazy" class="size-11 shrink-0 rounded-[10px]" />}
+                <span class="flex min-w-0 flex-col">
+                  <span class="font-medium text-foreground">{t.name}</span>
+                  {t.replaces && <span class="text-sm text-muted">Alternative to {t.replaces}</span>}
+                  {t.note && <span class="text-sm text-muted">{t.note}</span>}
+                </span>
+                <span class="ml-auto text-muted" aria-hidden="true">&#8599;</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+
+    <div class="post-prose reveal" style="--i: 5">
+      <Content />
+    </div>
+
+    {d.faq.length > 0 && (
+      <section class="flex flex-col gap-3" aria-labelledby="faq">
+        <h2 id="faq" class="text-lg font-semibold text-foreground">FAQ</h2>
+        {d.faq.map((f) => (
+          <details class="rounded-lg border border-border p-4">
+            <summary class="cursor-pointer font-medium text-foreground">{f.q}</summary>
+            <p class="mt-2 leading-relaxed text-secondary">{f.a}</p>
+          </details>
+        ))}
+      </section>
+    )}
+
+    {d.sources.length > 0 && (
+      <section class="flex flex-col gap-2 text-sm" aria-labelledby="sources">
+        <h2 id="sources" class="font-medium text-muted">Sources</h2>
+        <ul class="flex flex-col gap-1">
+          {d.sources.map((s) => (
+            <li class="list-none"><a class="text-secondary underline-offset-4 hover:underline" href={s.url} target="_blank" rel="noopener">{s.label}</a></li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <p class="text-sm text-muted">
+      More guides like this: <a class="text-foreground underline-offset-4 hover:underline" href="/links">bipul.online/links</a>
+      &middot; <a class="text-foreground underline-offset-4 hover:underline" href="https://instagram.com/bipul.skill" target="_blank" rel="noopener">@bipul.skill</a>
+    </p>
+  </article>
+
+  <SiteFooter />
+</Layout>

@@ -215,4 +215,25 @@
     border: 1px solid hsl(var(--theme-border));
     border-radius: 0.375rem;
   }
+
+  .post-prose table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  .post-prose th,
+  .post-prose td {
+    border-bottom: 1px solid hsl(var(--theme-border));
+    padding: 0.5rem 0.75rem 0.5rem 0;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .post-prose th {
+    color: hsl(var(--theme-foreground));
+    font-weight: 500;
+  }
 }

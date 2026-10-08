@@ -1,0 +1,217 @@
+---
+title: "Free Adobe alternatives: ArtCraft rebuilt Photoshop, Premiere and 5 more apps"
+description: "ArtCraft released free, open-source alternatives to Photoshop, Premiere Pro, After Effects, Illustrator, Lightroom, InDesign and Acrobat, written in Rust with AI. Here's what they are, how to get them, and what to expect."
+keyword: "free adobe alternatives"
+pubDate: 2026-10-09
+cover: "/guides/free-adobe-alternatives/cover.jpg"
+coverWide: "/guides/free-adobe-alternatives/cover-4x3.jpg"
+coverAlt: "Ben pulling the ArtCraft app icons out of a laptop under a crossed-out Adobe logo and the word REBUILT."
+tldr:
+  - "ArtCraft released 7 free, open-source apps that copy the look and workflow of Photoshop, Premiere Pro, After Effects, Illustrator, Lightroom, InDesign and Acrobat."
+  - "They're native apps written in Rust for Mac, Windows and Linux, and most also run in the browser."
+  - "The developer says Claude Opus 5.5 wrote the code as a 'clean-room' rebuild: they studied how Adobe's apps behave and never copied Adobe's code."
+  - "It's early. PhotoCraft is labeled early alpha and the others are still in development, so keep Adobe for paid client work."
+  - "Every action is a command, so AI agents can drive these apps through a CLI or an MCP server."
+primary:
+  label: "Download the apps"
+  url: "https://getartcraft.com/apps"
+secondary:
+  label: "Source code on GitHub"
+  url: "https://github.com/storytold"
+tools:
+  - name: "PhotoCraft"
+    replaces: "Photoshop"
+    url: "https://getartcraft.com/apps/photocraft"
+    icon: "/guides/free-adobe-alternatives/icons/photocraft.png"
+  - name: "FilmCraft"
+    replaces: "Premiere Pro"
+    url: "https://getartcraft.com/apps/filmcraft"
+    icon: "/guides/free-adobe-alternatives/icons/filmcraft.png"
+  - name: "EffectCraft"
+    replaces: "After Effects"
+    url: "https://getartcraft.com/apps/effectcraft"
+    icon: "/guides/free-adobe-alternatives/icons/effectcraft.png"
+  - name: "VectorCraft"
+    replaces: "Illustrator"
+    url: "https://getartcraft.com/apps/vectorcraft"
+    icon: "/guides/free-adobe-alternatives/icons/vectorcraft.png"
+  - name: "LightCraft"
+    replaces: "Lightroom"
+    url: "https://getartcraft.com/apps/lightcraft"
+    icon: "/guides/free-adobe-alternatives/icons/lightcraft.png"
+  - name: "DesignCraft"
+    replaces: "InDesign"
+    url: "https://getartcraft.com/apps/designcraft"
+    icon: "/guides/free-adobe-alternatives/icons/designcraft.png"
+  - name: "PdfCraft"
+    replaces: "Acrobat"
+    url: "https://getartcraft.com/apps/pdfcraft"
+    icon: "/guides/free-adobe-alternatives/icons/pdfcraft.png"
+faq:
+  - q: "Is ArtCraft really free?"
+    a: "Yes. The apps are open source. The GitHub repositories are licensed MIT or Apache-2.0, and installers are free on getartcraft.com. The team says it funds development by selling access to its separate AI image tools."
+  - q: "Is it legal to clone Photoshop?"
+    a: "ArtCraft calls it a clean-room reimplementation: the team studied how Adobe's apps look and behave and built new code from public specs such as the PSD file format, without copying Adobe's code. That's their claim, not a court ruling."
+  - q: "Can PhotoCraft open PSD files?"
+    a: "Yes. PhotoCraft opens and saves layered PSD files. Its README says re-saving keeps the render of 307 of the 309 psd-tools test files."
+  - q: "Can ArtCraft replace Adobe for professional work right now?"
+    a: "Not yet. PhotoCraft is labeled early alpha and the other apps are still in development. Early users report bugs, and some pro features are missing. Try it for personal projects first."
+  - q: "Which platforms does it run on?"
+    a: "macOS, Windows and Linux, and most of the apps also have a web version. FilmCraft is desktop only for now."
+sources:
+  - label: "ArtCraft: all Crafting Apps"
+    url: "https://getartcraft.com/apps"
+  - label: "ArtCraft on GitHub (storytold)"
+    url: "https://github.com/storytold"
+  - label: "PhotoCraft README and AGENTS.md"
+    url: "https://github.com/storytold/photocraft"
+  - label: "PetaPixel: Someone rebuilt free, open-source versions of Photoshop, Premiere, and Lightroom using AI"
+    url: "https://petapixel.com/2026/10/07/someone-rebuilt-free-open-source-versions-of-photoshop-premiere-and-lightroom-using-ai/"
+  - label: "Techaeris: ArtCraft launches 7 open-source creative apps built in Rust"
+    url: "https://techaeris.com/2026/10/07/artcraft-launches-7-open-source-creative/"
+  - label: "Android Headlines: This developer built 7 free Adobe alternatives with AI"
+    url: "https://www.androidheadlines.com/2026/10/tired-of-adobes-subscriptions-this-developer-built-7-free-alternatives-with-ai.html"
+---
+I've paid for Adobe Creative Cloud for years, so a headline like "someone
+rebuilt Photoshop for free" made me roll my eyes. Then I opened the GitHub repo.
+
+A small team called [ArtCraft](https://getartcraft.com/) released seven
+open-source apps at once, each one modeled on an Adobe product. They aren't web
+demos or plugins. They're native desktop apps, and the developer says an AI
+model wrote the code. I went through the site, the repos and the press coverage
+to work out what's real, what's hype, and whether you should care.
+
+## What ArtCraft actually released
+
+Here's the lineup, with a link to each app's page and its source code:
+
+| ArtCraft app | Modeled on | What it does | Code |
+|---|---|---|---|
+| [PhotoCraft](https://getartcraft.com/apps/photocraft) | Photoshop | Image editing with layers, masks and PSD files | [GitHub](https://github.com/storytold/photocraft) |
+| [FilmCraft](https://getartcraft.com/apps/filmcraft) | Premiere Pro | Timeline video editing | [GitHub](https://github.com/storytold/filmcraft) |
+| [EffectCraft](https://getartcraft.com/apps/effectcraft) | After Effects | Motion graphics and visual effects | [GitHub](https://github.com/storytold/effectcraft) |
+| [VectorCraft](https://getartcraft.com/apps/vectorcraft) | Illustrator | Vector illustration | [GitHub](https://github.com/storytold/vectorcraft) |
+| [LightCraft](https://getartcraft.com/apps/lightcraft) | Lightroom | Photo library and raw developer | [GitHub](https://github.com/storytold/lightcraft) |
+| [DesignCraft](https://getartcraft.com/apps/designcraft) | InDesign | Page layout for magazines and print | [GitHub](https://github.com/storytold/designcraft) |
+| [PdfCraft](https://getartcraft.com/apps/pdfcraft) | Acrobat | Read, merge, split and secure PDFs | [GitHub](https://github.com/storytold/pdfcraft) |
+
+All seven have installers for macOS, Windows and Linux. Every app except
+FilmCraft also runs in a browser, according to the
+[ArtCraft apps page](https://getartcraft.com/apps). The code is free to use: the
+PhotoCraft repo is dual-licensed MIT or Apache-2.0.
+
+One naming note. Some early articles call the PDF app "PrintCraft". The
+official site and GitHub both say PdfCraft, so I'm going with that.
+
+## Who built it, and how
+
+The developer behind ArtCraft is Brandon Thomas. He says the apps were written
+with Claude Opus 5.5, from scratch, in Rust. That claim comes from coverage in
+[PetaPixel](https://petapixel.com/2026/10/07/someone-rebuilt-free-open-source-versions-of-photoshop-premiere-and-lightroom-using-ai/)
+and [Android Headlines](https://www.androidheadlines.com/2026/10/tired-of-adobes-subscriptions-this-developer-built-7-free-alternatives-with-ai.html).
+I couldn't find a first-party post spelling out the process, so treat the
+"AI wrote it" part as his description rather than something I verified.
+
+Rust matters here. It's a fast, memory-safe language, and the
+[PhotoCraft README](https://github.com/storytold/photocraft) is proud that the
+app has "no Electron, no web view". The web version is the same Rust code
+compiled to WebAssembly, so it isn't a separate, weaker product.
+
+People noticed fast. The PhotoCraft repo was created on September 30, 2026, and
+it had more than 25,000 GitHub stars nine days later.
+
+## Is it legal to rebuild Photoshop?
+
+ArtCraft calls every app a "clean-room reimplementation". The idea is old and
+simple: you study how a program behaves and looks, then write your own code
+from public information, without ever copying the original source.
+
+ArtCraft writes this into the rules for contributors. The PhotoCraft
+[AGENTS.md](https://github.com/storytold/photocraft/blob/main/AGENTS.md) says the
+team studied Photoshop "for behaviour and look only" and must "never copy their
+code, shaders, profiles or assets". New code is built from public specs such as
+Adobe's PSD file format and the ICC color standard.
+
+That's their claim, though, not a court ruling. If Adobe disagrees, lawyers
+will decide, not a README. [Techaeris](https://techaeris.com/2026/10/07/artcraft-launches-7-open-source-creative/)
+also points out that the wider ArtCraft project mentions a "fair source" model
+in places, so check each repo's license before you ship anything commercial
+with it.
+
+## Does it actually work?
+
+![PhotoCraft editing The Great Wave with a Curves adjustment and the Layers panel](/guides/free-adobe-alternatives/photocraft-screenshot.jpg)
+
+That screenshot is from the PhotoCraft repo, not a mockup. If you've used
+Photoshop, the layout will feel familiar: tools on the left, properties and
+layers on the right, the usual menus up top. The README lists:
+
+- 16 adjustment layers, including Curves, Levels, Vibrance and Hue/Saturation
+- layer styles like Drop Shadow, Stroke and Outer Glow on any layer, type included
+- masks, smart selection, type and vector tools
+- the same shortcuts, from ⌘J to ⇧⌘D
+
+The part that surprised me is PSD support. PhotoCraft opens and saves layered
+Photoshop files, and the README says re-saving keeps the render of 307 out of
+309 files in the psd-tools test set. That's the difference between a toy and
+something you could actually open a client file in.
+
+## Then they kept going
+
+A week after the Adobe set, ArtCraft pushed five more clean-room apps to
+[GitHub](https://github.com/storytold), this time aimed at Microsoft, Avid and
+Autodesk:
+
+- [WordCraft](https://github.com/storytold/wordcraft), modeled on Microsoft Word
+- [GridCraft](https://github.com/storytold/gridcraft), a spreadsheet in the style of Excel
+- [DeckCraft](https://github.com/storytold/deckcraft), modeled on PowerPoint
+- [SoundCraft](https://github.com/storytold/soundcraft), modeled on Pro Tools
+- [CADCraft](https://github.com/storytold/cadcraft), an AutoCAD-style drafting app
+
+The first app went public on September 30. Number twelve went up on October 7.
+Twelve apps in a week, even as early releases, is the bit that made me stop
+scrolling.
+
+## The honest part: don't cancel Adobe yet
+
+I'd love to tell you to switch today. I can't.
+
+- PhotoCraft is labeled "early alpha" in its own README. Most of the others are
+  still marked "in development" on the ArtCraft site.
+- [Android Headlines](https://www.androidheadlines.com/2026/10/tired-of-adobes-subscriptions-this-developer-built-7-free-alternatives-with-ai.html)
+  reports early users hitting bugs in basic features.
+- The developer first talked about reaching "100% parity with Adobe within a
+  month", then walked it back.
+- If your work depends on one specific pro feature, it may simply not be there
+  yet.
+
+So keep your paid tools for client work. Play with these on personal projects.
+
+## Why it matters anyway: your AI can drive these apps
+
+This is the part I think most coverage missed.
+
+In every ArtCraft app, each button is a command. The same action can be run
+from the screen, from a command-line tool, from a JSON control channel, or
+through an MCP server, which is how AI agents like Claude plug into other
+software. Each repo also ships an `AGENTS.md` file, basically a handbook your
+AI reads to learn the app's tools.
+
+Why should you care? AI image and video tools are good at first drafts and bad
+at small fixes. You ask for one change and the whole image shifts. A layered
+app solves that. Let an AI agent build the draft as real layers, then nudge the
+one layer that's wrong yourself. AI makes the draft, and you still own every
+layer.
+
+## How to try it
+
+1. Download an installer from [getartcraft.com/apps](https://getartcraft.com/apps).
+   Start with PhotoCraft, since it's the most mature.
+2. Or, if you use Claude Code, point it at [github.com/storytold](https://github.com/storytold)
+   and ask it to build the app you want. The `AGENTS.md` file gives it the
+   context it needs.
+3. Open a copy of a real PSD, not your only copy, and see what survives.
+
+If you try it, tell me what broke and what didn't on
+[Instagram @bipul.skill](https://instagram.com/bipul.skill). I'll update this
+guide as the apps change.
