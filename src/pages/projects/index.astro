@@ -4,7 +4,7 @@ import SiteHeader from "../../components/SiteHeader.astro";
 import SiteFooter from "../../components/SiteFooter.astro";
 import ProjectStats from "../../components/projects/ProjectStats.astro";
 import ProjectTabs from "../../components/projects/ProjectTabs.astro";
-import { loadProgress, mergeProgress, sortChannels } from "../../lib/progress";
+import { loadProgress, mergeProgress } from "../../lib/progress";
 
 // Rendered on request so progress synced from OpenSEO shows up without a
 // redeploy. The edge cache keeps KV reads cheap.
@@ -12,7 +12,6 @@ export const prerender = false;
 
 const payload = await loadProgress();
 const sites = mergeProgress(payload);
-const channels = sortChannels(payload);
 
 Astro.response.headers.set(
   "cache-control",
@@ -29,7 +28,7 @@ const fullFmt = new Intl.DateTimeFormat("en-US", {
 
 <Layout
   title="Projects | Bipul Kumar"
-  description="The websites and YouTube channels I'm running, how far along each one is, and what I've shipped recently."
+  description="The websites I'm running, how far along each one is, and what I've shipped recently."
 >
   <SiteHeader active="projects" />
 
@@ -45,10 +44,10 @@ const fullFmt = new Intl.DateTimeFormat("en-US", {
     }
   </section>
 
-  <ProjectStats sites={sites} channels={channels} class="reveal" style="--i: 2" />
+  <ProjectStats sites={sites} class="reveal" style="--i: 2" />
 
   <section class="reveal flex flex-col gap-4" style="--i: 3">
-    <ProjectTabs sites={sites} channels={channels} synced={!!payload} />
+    <ProjectTabs sites={sites} synced={!!payload} />
   </section>
 
   <SiteFooter />

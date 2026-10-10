@@ -5,7 +5,7 @@ import SiteFooter from "../components/SiteFooter.astro";
 import ProjectStats from "../components/projects/ProjectStats.astro";
 import ProjectTabs from "../components/projects/ProjectTabs.astro";
 import { getCollection } from "astro:content";
-import { loadProgress, mergeProgress, sortChannels } from "../lib/progress";
+import { loadProgress, mergeProgress } from "../lib/progress";
 
 // Rendered on request so the project cards show progress synced from
 // OpenSEO without a redeploy. The edge cache keeps KV reads cheap.
@@ -15,7 +15,6 @@ const email = "hello@bipul.online";
 
 const payload = await loadProgress();
 const sites = mergeProgress(payload);
-const channels = sortChannels(payload);
 
 Astro.response.headers.set(
   "cache-control",
@@ -66,7 +65,7 @@ const elsewhere = [
     </div>
   </section>
 
-  <ProjectStats sites={sites} channels={channels} class="reveal" style="--i: 2" />
+  <ProjectStats sites={sites} class="reveal" style="--i: 2" />
 
   <section class={`reveal flex flex-col gap-3 ${card}`} style="--i: 3" id="about">
     <h2 class="text-sm font-medium text-muted">About</h2>
@@ -79,7 +78,7 @@ const elsewhere = [
       <p>
         Most of the work behind them is automated. I set up SEO, content,
         and social media workflows that run on their own, which is how one
-        person can run a dozen websites and a handful of YouTube channels.
+        person can run a dozen websites.
         When a project needs something new, I learn it, ship it, and keep
         improving it.
       </p>
@@ -95,7 +94,7 @@ const elsewhere = [
       <h2 class="text-sm font-medium text-muted">Projects</h2>
       <a href="/projects" class={moreLink}>All projects &rarr;</a>
     </div>
-    <ProjectTabs sites={sites} channels={channels} headingLevel="h3" synced={!!payload} limit={6} />
+    <ProjectTabs sites={sites} headingLevel="h3" synced={!!payload} limit={6} />
   </section>
 
   <section class="reveal flex flex-col gap-4" style="--i: 5" id="writing">

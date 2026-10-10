@@ -1,104 +1,39 @@
 ---
-// Websites / YouTube tabs with outlined project cards. Tabs are `?tab=` links
-// that work without JS; scripts/tabs.ts switches them in place.
+// Outlined website project cards.
 import StatusPill from "./StatusPill.astro";
 import ProgressBlock from "./ProgressBlock.astro";
 import {
-  channelSlug,
   faviconUrl,
-  fmtCompact,
-  pctChange,
-  type Channel,
   type ProjectWithProgress,
 } from "../../lib/progress";
 import { DEFAULT_PROPERTY_MAP } from "../../lib/ga-properties";
 
 interface Props {
   sites: ProjectWithProgress[];
-  channels: Channel[];
   /** Heading level of each card's title, to fit the page outline. */
   headingLevel?: "h2" | "h3";
   /** Shown when there's no synced progress at all. */
   synced?: boolean;
-  /** Cards per tab; the rest sit behind a "See all" link to /projects. */
+  /** Max cards; the rest sit behind a "See all" link to /projects. */
   limit?: number;
 }
 
-const { sites: allSites, channels: allChannels, headingLevel = "h2", synced = true, limit } = Astro.props;
+const { sites: allSites, headingLevel = "h2", synced = true, limit } = Astro.props;
 const sites = limit ? allSites.slice(0, limit) : allSites;
-const channels = limit ? allChannels.slice(0, limit) : allChannels;
 const Heading = headingLevel;
-
-const TABS = [
-  { id: "sites", label: "Websites", count: allSites.length },
-  { id: "youtube", label: "YouTube", count: allChannels.length },
-] as const;
-type TabId = (typeof TABS)[number]["id"];
-
-const requested = Astro.url.searchParams.get("tab");
-const active: TabId = requested === "youtube" && allChannels.length > 0 ? "youtube" : "sites";
-
-const building =
-  allSites.filter((s) => s.progress?.status === "building").length +
-  allChannels.filter((c) => c.status === "building").length;
 
 const dayFmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 const fmtDay = (d: string) => dayFmt.format(new Date(d.length === 10 ? `${d}T00:00:00Z` : d));
 
 const card =
   "group flex h-full flex-col gap-3 rounded-xl border border-border bg-foreground/[0.02] p-4 transition-colors hover:border-foreground/25 hover:bg-foreground/[0.04] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60";
-const tabBase =
-  "inline-flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-md px-3 text-sm font-medium transition-colors sm:min-h-9 sm:flex-none sm:px-4";
-const tabOn = "bg-foreground/10 text-foreground";
-const tabOff = "text-muted hover:text-foreground";
 const seeAll =
   "flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-dashed border-border px-4 py-3 text-sm font-medium text-muted transition-colors hover:border-foreground/25 hover:text-foreground sm:col-span-2";
 ---
 
-<div
-  class="flex w-full gap-1 rounded-lg border border-border bg-foreground/[0.02] p-1 sm:w-fit"
-  role="tablist"
-  aria-label="Project type"
-  data-tabs
->
-  {
-    TABS.map((tab) => (
-      <a
-        href={`?tab=${tab.id}`}
-        id={`tab-${tab.id}`}
-        role="tab"
-        aria-selected={tab.id === active ? "true" : "false"}
-        aria-controls={`panel-${tab.id}`}
-        tabindex={tab.id === active ? 0 : -1}
-        data-tab={tab.id}
-        class={`${tabBase} ${tab.id === active ? tabOn : tabOff}`}
-        data-on={tabOn}
-        data-off={tabOff}
-      >
-        {tab.label}
-        <span class="rounded-full bg-foreground/10 px-1.5 text-xs tabular-nums text-secondary">
-          {tab.count}
-        </span>
-      </a>
-    ))
-  }
-</div>
-
-{
-  building > 0 && (
-    <p class="text-sm text-muted">
-      <span class="mr-1.5 inline-block size-1.5 rounded-full bg-primary align-middle" aria-hidden="true" />
-      {building} {building === 1 ? "project" : "projects"} in active development
-    </p>
-  )
-}
-
 <!-- Websites -->
 <div
   id="panel-sites"
-  role="tabpanel"
-  aria-labelledby="tab-sites"
-  hidden={active !== "sites"}
   class="grid gap-3 sm:grid-cols-2"
 >
   {
@@ -151,97 +86,6 @@ const seeAll =
   }
 </div>
 
-<!-- YouTube -->
-<div
-  id="panel-youtube"
-  role="tabpanel"
-  aria-labelledby="tab-youtube"
-  hidden={active !== "youtube"}
-  class="grid gap-3 sm:grid-cols-2"
->
-  {
-    channels.length === 0 && (
-      <p class="text-sm text-muted sm:col-span-2">No channels have synced yet.</p>
-    )
-  }
-  {
-    channels.map((c) => {
-      const delta = pctChange(c.stats.views28d, c.stats.views28dPrev);
-      return (
-        <a href={`/projects/youtube/${channelSlug(c)}`} class={card}>
-          <div class="flex items-start gap-3">
-            {c.avatar ? (
-              <img
-                src={c.avatar.replace(/=s\d+-/, "=s88-")}
-                alt=""
-                width="32"
-                height="32"
-                loading="lazy"
-                referrerpolicy="no-referrer"
-                class="size-8 shrink-0 rounded-full bg-foreground/5"
-              />
-            ) : (
-              <span class="size-8 shrink-0 rounded-full bg-foreground/10" />
-            )}
-            <div class="flex min-w-0 flex-1 flex-col gap-0.5">
-              <Heading class="truncate font-medium text-foreground">{c.title}</Heading>
-              {c.handle && <span class="truncate text-xs text-muted">{c.handle}</span>}
-            </div>
-            <StatusPill status={c.status} />
-          </div>
-
-          {c.tagline && <p class="line-clamp-2 text-sm text-secondary">{c.tagline}</p>}
-
-          <dl class="grid grid-cols-3 gap-2 text-center">
-            <div class="rounded-md bg-foreground/[0.04] px-1 py-2">
-              <dt class="text-[11px] text-muted">Subscribers</dt>
-              <dd class="text-sm font-semibold text-foreground tabular-nums">{fmtCompact(c.stats.subscribers)}</dd>
-            </div>
-            <div class="rounded-md bg-foreground/[0.04] px-1 py-2">
-              <dt class="text-[11px] text-muted">Views</dt>
-              <dd class="text-sm font-semibold text-foreground tabular-nums">{fmtCompact(c.stats.views)}</dd>
-            </div>
-            <div class="rounded-md bg-foreground/[0.04] px-1 py-2">
-              <dt class="text-[11px] text-muted">Videos</dt>
-              <dd class="text-sm font-semibold text-foreground tabular-nums">{fmtCompact(c.stats.videos)}</dd>
-            </div>
-          </dl>
-
-          <ProgressBlock label={c.title} status={c.status} progress={c.progress} now={c.now} compact />
-
-          <div class="mt-auto flex items-center gap-3 border-t border-border pt-3 text-xs text-muted">
-            {c.stats.views28d != null && (
-              <span class="tabular-nums">
-                <span class="font-medium text-foreground">{fmtCompact(c.stats.views28d)}</span> views/28d
-                {delta != null && (
-                  <span class={delta >= 0 ? "ml-1 text-success" : "ml-1 text-[hsl(0_72%_64%)]"}>
-                    {`${delta >= 0 ? "+" : ""}${delta}%`}
-                  </span>
-                )}
-              </span>
-            )}
-            {c.latestVideo && (
-              <span class={c.stats.views28d != null ? "hidden sm:inline" : undefined}>
-                Uploaded {fmtDay(c.latestVideo.publishedAt)}
-              </span>
-            )}
-            <span class="ml-auto transition-transform group-hover:translate-x-0.5" aria-hidden="true">
-              &rarr;
-            </span>
-          </div>
-        </a>
-      );
-    })
-  }
-  {
-    allChannels.length > channels.length && (
-      <a href="/projects?tab=youtube" class={seeAll}>
-        See all {allChannels.length} channels <span aria-hidden="true">&rarr;</span>
-      </a>
-    )
-  }
-</div>
-
 {
   !synced && (
     <p class="text-sm text-muted">
@@ -250,6 +94,3 @@ const seeAll =
   )
 }
 
-<script>
-  import "../../scripts/tabs.ts";
-</script>
