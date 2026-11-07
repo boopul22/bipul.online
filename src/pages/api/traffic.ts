@@ -12,7 +12,15 @@ export const prerender = false;
 // page view — GA4 daily metrics don't change second-to-second anyway.
 const EDGE_TTL = 300; // seconds
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ request }) => {
+  // Cache-Control alone does not cache a Worker's own response, so without the
+  // Cache API every hit would mint a token and fan out to GA. The key drops the
+  // query string so `?x=1` can't skip the cache.
+  const cache = (globalThis.caches as unknown as { default?: Cache } | undefined)?.default;
+  const cacheKey = new Request(new URL("/api/traffic", request.url));
+  const hit = await cache?.match(cacheKey);
+  if (hit) return new Response(hit.body, hit);
+
   const e = env as Record<string, string | undefined>;
   const saKey = e.GA_SA_KEY;
   let propertyMap = DEFAULT_PROPERTY_MAP;
@@ -30,7 +38,9 @@ export const GET: APIRoute = async () => {
 
   try {
     const payload = await fetchTraffic(propertyMap, saKey);
-    return json(payload, 200, EDGE_TTL);
+    const response = json(payload, 200, EDGE_TTL);
+    await cache?.put(cacheKey, response.clone()).catch(() => {});
+    return response;
   } catch (err) {
     return json({ error: String(err instanceof Error ? err.message : err) }, 502, 0);
   }
