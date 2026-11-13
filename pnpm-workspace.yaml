@@ -1,0 +1,14 @@
+# Not a monorepo: this file only carries pnpm settings.
+# `packages` is required by pnpm 10 (Cloudflare build image); pnpm 11+ makes it optional.
+packages:
+  - .
+ignoreWorkspaceRootCheck: true
+# Build-script allowlist, written twice: pnpm 11+ reads allowBuilds, pnpm 10 reads onlyBuiltDependencies.
+allowBuilds:
+  'esbuild': true
+  'sharp': true
+  'workerd': true
+onlyBuiltDependencies:
+  - 'esbuild'
+  - 'sharp'
+  - 'workerd'
